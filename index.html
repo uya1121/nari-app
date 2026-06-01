@@ -1991,6 +1991,7 @@ function handlePhoto(e) {
 async function analyzePhoto() {
   if (!state.photoData) { showToast('写真を選んでください'); return; }
 
+  const photoData = state.photoData; // closeModal前に保存！
   closeModal();
   showPage('chat');
   addUserMessage('📸 写真から食事を認識中...');
@@ -2002,7 +2003,7 @@ async function analyzePhoto() {
 
   try {
     const result = await Promise.race([
-      callClaudeForMeal('写真の食事を分析してください', state.photoData),
+      callClaudeForMeal('写真の食事を分析してください', photoData),
       timeoutPromise
     ]);
     removeTyping();
@@ -2013,7 +2014,7 @@ async function analyzePhoto() {
       addAIMessage(result.comment || '写真から認識しました！');
       for (const meal of result.meals) { addAIMessage('', meal); }
     } else {
-      addAIMessage('DEBUG: ' + JSON.stringify(result).slice(0, 200));
+      addAIMessage('食事を認識できませんでした。もう一度試してみてください。');
     }
   } catch (e) {
     removeTyping();
