@@ -2013,7 +2013,7 @@ async function analyzePhoto() {
       addAIMessage(result.comment || '写真から認識しました！');
       for (const meal of result.meals) { addAIMessage('', meal); }
     } else {
-      addAIMessage('食事を認識できませんでした。テキストで入力してみてください。');
+      addAIMessage('DEBUG: ' + JSON.stringify(result).slice(0, 200));
     }
   } catch (e) {
     removeTyping();
