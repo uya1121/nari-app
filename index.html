@@ -1983,7 +1983,7 @@ async function analyzePhoto() {
     }
   } catch (e) {
     removeTyping();
-    addAIMessage('写真認識にはAPIキーが必要です。\nデモとして一般的な食事として記録します。');
+    addAIMessage('写真認識エラー：' + (e.message || '不明') + '\nデモとして記録します。');
     const demo = { name: '食事（写真）', calories: 400, protein: 15, carbs: 55, fat: 12, vitaminC: 10, iron: 1.0, emoji: '🍱' };
     setTimeout(() => addAIMessage('', demo), 300);
   }
