@@ -1617,7 +1617,7 @@ async function sendMessage() {
 // ===== CLAUDE API =====
 async function callClaudeForMeal(userText, imageBase64 = null) {
   const apiKey = await getApiKey();
-  if (!apiKey || apiKey === 'demo') throw new Error('no key');
+  if (apiKey === 'demo') throw new Error('no key');
 
   const systemPrompt = `あなたは栄養管理AIです。ユーザーが食べた食事を教えてくれます。
 JSON形式で返答してください：
@@ -1671,7 +1671,7 @@ JSON形式で返答してください：
 }
 
 async function getApiKey() {
-  return state.apiKey || null;
+  return state.apiKey || 'server';
 }
 
 // Demo fallback
