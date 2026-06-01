@@ -1165,6 +1165,56 @@
   </div>
 </div>
 
+<!-- Move Meal Date Modal -->
+<div class="modal-overlay" id="mealMoveModal" onclick="closeMealMoveModal()">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="mealMoveTitle">📅 日付を変更</div>
+    <div style="margin-bottom:20px">
+      <label style="font-size:13px;color:var(--gray-600);display:block;margin-bottom:8px">移動先の日付</label>
+      <input type="date" id="mealMoveDateInput" style="width:100%;font-size:16px;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:12px;font-family:var(--font);outline:none;box-sizing:border-box">
+    </div>
+    <button class="btn-primary" onclick="confirmMealMove()">移動する</button>
+    <button onclick="closeMealMoveModal()" style="width:100%;margin-top:10px;padding:12px;border:none;background:none;color:var(--gray-400);font-size:15px;cursor:pointer">キャンセル</button>
+  </div>
+</div>
+
+<!-- Edit Meal Modal -->
+<div class="modal-overlay" id="mealEditModal" onclick="closeMealEditModal()">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">✏️ 食事を編集</div>
+    <input type="hidden" id="editMealId">
+    <input type="hidden" id="editMealDate">
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+      <div>
+        <label style="font-size:12px;color:var(--gray-500);margin-bottom:4px;display:block">食事名</label>
+        <input type="text" id="editMealName" style="width:100%;font-size:15px;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-family:var(--font);outline:none;box-sizing:border-box">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label style="font-size:12px;color:var(--gray-500);margin-bottom:4px;display:block">🔥 カロリー(kcal)</label>
+          <input type="number" id="editMealCalories" style="width:100%;font-size:15px;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-family:var(--font);outline:none;box-sizing:border-box">
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--gray-500);margin-bottom:4px;display:block">💪 タンパク質(g)</label>
+          <input type="number" id="editMealProtein" style="width:100%;font-size:15px;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-family:var(--font);outline:none;box-sizing:border-box">
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--gray-500);margin-bottom:4px;display:block">🌾 炭水化物(g)</label>
+          <input type="number" id="editMealCarbs" style="width:100%;font-size:15px;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-family:var(--font);outline:none;box-sizing:border-box">
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--gray-500);margin-bottom:4px;display:block">🥑 脂質(g)</label>
+          <input type="number" id="editMealFat" style="width:100%;font-size:15px;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-family:var(--font);outline:none;box-sizing:border-box">
+        </div>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="confirmMealEdit()">保存する</button>
+    <button onclick="closeMealEditModal()" style="width:100%;margin-top:10px;padding:12px;border:none;background:none;color:var(--gray-400);font-size:15px;cursor:pointer">キャンセル</button>
+  </div>
+</div>
+
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
@@ -1732,6 +1782,10 @@ function guessMealDemo(text) {
   return { name: text.slice(0, 20), calories: 300, protein: 10, carbs: 40, fat: 8, vitaminC: 5, iron: 0.5, emoji: '🍽️' };
 }
 
+// ===== MEAL EDIT / MOVE / DELETE =====
+let _moveMealId = null;   // nullの場合はその日まとめて移動
+let _moveFromDate = null;
+
 function deleteMeal(id, dateStr) {
   if (!confirm('この食事記録を削除しますか？')) return;
   state.meals = state.meals.filter(m => m.id !== id);
@@ -1741,20 +1795,85 @@ function deleteMeal(id, dateStr) {
   renderUnifiedCalendar();
 }
 
-function moveMealDate(id, currentDateStr) {
-  const newDate = prompt('移動先の日付を入力してください（例：2026-05-30）', currentDateStr);
-  if (!newDate || !/^\d{4}-\d{2}-\d{2}$/.test(newDate)) {
-    if (newDate !== null) alert('日付の形式が正しくありません（例：2026-05-30）');
-    return;
+function deleteDayMeals(dateStr) {
+  const [y, mo, d] = dateStr.split('-');
+  if (!confirm(`${parseInt(mo)}月${parseInt(d)}日の食事をすべて削除しますか？`)) return;
+  state.meals = state.meals.filter(m => m.date !== dateStr);
+  save();
+  showToast('🗑️ まとめて削除しました');
+  showUnifiedDayDetail(dateStr);
+  renderUnifiedCalendar();
+}
+
+function openMoveMealModal(id, dateStr) {
+  _moveMealId = id;
+  _moveFromDate = dateStr;
+  document.getElementById('mealMoveTitle').textContent = '📅 この食事の日付を変更';
+  document.getElementById('mealMoveDateInput').value = dateStr;
+  document.getElementById('mealMoveModal').classList.add('open');
+}
+
+function openBulkMoveModal(dateStr) {
+  _moveMealId = null;
+  _moveFromDate = dateStr;
+  const [y, mo, d] = dateStr.split('-');
+  document.getElementById('mealMoveTitle').textContent = `📅 ${parseInt(mo)}月${parseInt(d)}日の食事をまとめて移動`;
+  document.getElementById('mealMoveDateInput').value = dateStr;
+  document.getElementById('mealMoveModal').classList.add('open');
+}
+
+function closeMealMoveModal() {
+  document.getElementById('mealMoveModal').classList.remove('open');
+}
+
+function confirmMealMove() {
+  const newDate = document.getElementById('mealMoveDateInput').value;
+  if (!newDate) return;
+  if (_moveMealId !== null) {
+    const meal = state.meals.find(m => m.id === _moveMealId);
+    if (meal) meal.date = newDate;
+  } else {
+    state.meals.filter(m => m.date === _moveFromDate).forEach(m => { m.date = newDate; });
   }
+  save();
+  closeMealMoveModal();
+  showToast('📅 移動しました');
+  showUnifiedDayDetail(_moveFromDate);
+  renderUnifiedCalendar();
+}
+
+function openEditMealModal(id, dateStr) {
   const meal = state.meals.find(m => m.id === id);
-  if (meal) {
-    meal.date = newDate;
-    save();
-    showToast('📅 日付を変更しました');
-    showUnifiedDayDetail(currentDateStr);
-    renderUnifiedCalendar();
-  }
+  if (!meal) return;
+  document.getElementById('editMealId').value = id;
+  document.getElementById('editMealDate').value = dateStr;
+  document.getElementById('editMealName').value = meal.name || '';
+  document.getElementById('editMealCalories').value = meal.calories || 0;
+  document.getElementById('editMealProtein').value = meal.protein || 0;
+  document.getElementById('editMealCarbs').value = meal.carbs || 0;
+  document.getElementById('editMealFat').value = meal.fat || 0;
+  document.getElementById('mealEditModal').classList.add('open');
+}
+
+function closeMealEditModal() {
+  document.getElementById('mealEditModal').classList.remove('open');
+}
+
+function confirmMealEdit() {
+  const id = Number(document.getElementById('editMealId').value);
+  const dateStr = document.getElementById('editMealDate').value;
+  const meal = state.meals.find(m => m.id === id);
+  if (!meal) return;
+  meal.name     = document.getElementById('editMealName').value;
+  meal.calories = Number(document.getElementById('editMealCalories').value) || 0;
+  meal.protein  = Number(document.getElementById('editMealProtein').value) || 0;
+  meal.carbs    = Number(document.getElementById('editMealCarbs').value) || 0;
+  meal.fat      = Number(document.getElementById('editMealFat').value) || 0;
+  save();
+  closeMealEditModal();
+  showToast('✅ 保存しました');
+  showUnifiedDayDetail(dateStr);
+  renderHome();
 }
 
 function getRecordDate() {
@@ -2221,13 +2340,18 @@ function showUnifiedDayDetail(dateStr) {
         🍽️ 食事 <span style="float:right;color:var(--gray-900)">${totalMealKcal} kcal</span>
       </div>
       ${dayMeals.map(m => `
-        <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--gray-100)">
+        <div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid var(--gray-100)">
           <span style="font-size:18px">${m.emoji||'🍽️'}</span>
           <span style="font-size:14px;flex:1">${m.name}</span>
-          <span style="font-size:12px;color:var(--gray-400);margin-right:4px">${m.calories||0} kcal</span>
-          <button onclick="moveMealDate(${m.id},'${dateStr}')" style="font-size:11px;padding:3px 7px;border:1px solid var(--gray-300);border-radius:8px;background:#fff;color:var(--gray-600);cursor:pointer">📅</button>
-          <button onclick="deleteMeal(${m.id},'${dateStr}')" style="font-size:11px;padding:3px 7px;border:1px solid #fcc;border-radius:8px;background:#fff;color:var(--red);cursor:pointer">🗑️</button>
+          <span style="font-size:12px;color:var(--gray-400)">${m.calories||0}kcal</span>
+          <button onclick="openEditMealModal(${m.id},'${dateStr}')" style="font-size:12px;padding:3px 8px;border:1px solid var(--gray-300);border-radius:8px;background:#fff;color:var(--gray-600);cursor:pointer">✏️</button>
+          <button onclick="openMoveMealModal(${m.id},'${dateStr}')" style="font-size:12px;padding:3px 8px;border:1px solid var(--gray-300);border-radius:8px;background:#fff;color:var(--gray-600);cursor:pointer">📅</button>
+          <button onclick="deleteMeal(${m.id},'${dateStr}')" style="font-size:12px;padding:3px 8px;border:1px solid #fcc;border-radius:8px;background:#fff;color:var(--red);cursor:pointer">🗑️</button>
         </div>`).join('')}
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button onclick="openBulkMoveModal('${dateStr}')" style="flex:1;font-size:12px;padding:7px;border:1px solid var(--gray-300);border-radius:10px;background:#fff;color:var(--gray-700);cursor:pointer">📅 まとめて移動</button>
+        <button onclick="deleteDayMeals('${dateStr}')" style="flex:1;font-size:12px;padding:7px;border:1px solid #fcc;border-radius:10px;background:#fff;color:var(--red);cursor:pointer">🗑️ まとめて削除</button>
+      </div>
     </div>`;
   }
 
