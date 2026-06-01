@@ -471,6 +471,9 @@
   .chat-btn:hover { opacity: 0.8; }
 
   .btn-photo { background: var(--gray-100); }
+  .btn-mic { background: var(--gray-100); transition: background 0.2s; }
+  .btn-mic.recording { background: var(--red); color: #fff; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
   .btn-send { background: var(--green); color: #fff; }
   .btn-send:disabled { background: var(--gray-200); cursor: not-allowed; }
 
@@ -1039,6 +1042,7 @@
           <button class="chat-btn btn-photo" onclick="showPhotoModal()" title="写真を撮る">📸</button>
           <textarea class="chat-input-box" id="chatInput" placeholder="「ランチにサラダチキンとコンビニのおにぎり食べた」" rows="1"
             onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
+          <button class="chat-btn btn-mic" id="micBtn" onclick="toggleVoiceInput()" title="音声入力">🎤</button>
           <button class="chat-btn btn-send" id="sendBtn" onclick="sendMessage()" disabled>↑</button>
         </div>
       </div>
@@ -1642,6 +1646,58 @@ function showTyping() {
 function removeTyping() {
   const t = document.getElementById('typing');
   if (t) t.remove();
+}
+
+// ===== 音声入力 =====
+let recognition = null;
+let isRecording = false;
+
+function toggleVoiceInput() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    showToast('このブラウザは音声入力に対応していません');
+    return;
+  }
+
+  if (isRecording) {
+    recognition.stop();
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  recognition.lang = 'ja-JP';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    isRecording = true;
+    document.getElementById('micBtn').classList.add('recording');
+    document.getElementById('micBtn').textContent = '⏹';
+    showToast('🎤 聞いています...');
+  };
+
+  recognition.onresult = (e) => {
+    const text = e.results[0][0].transcript;
+    const input = document.getElementById('chatInput');
+    input.value = text;
+    autoResize(input);
+    document.getElementById('sendBtn').disabled = false;
+    // 自動送信
+    setTimeout(() => sendMessage(), 300);
+  };
+
+  recognition.onerror = (e) => {
+    showToast('音声認識エラー：' + e.error);
+  };
+
+  recognition.onend = () => {
+    isRecording = false;
+    const btn = document.getElementById('micBtn');
+    btn.classList.remove('recording');
+    btn.textContent = '🎤';
+  };
+
+  recognition.start();
 }
 
 function handleChatKey(e) {
