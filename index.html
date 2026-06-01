@@ -1746,11 +1746,15 @@ async function callClaudeForMeal(userText, imageBase64 = null) {
     messages.push({ role: 'user', content: userText });
   }
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+
   const res = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ messages, systemPrompt })
-  });
+    body: JSON.stringify({ messages, systemPrompt }),
+    signal: controller.signal
+  }).finally(() => clearTimeout(timeout));
 
   if (!res.ok) {
     const errText = await res.text();
@@ -1938,12 +1942,25 @@ function handlePhoto(e) {
 
   const reader = new FileReader();
   reader.onload = function(ev) {
-    const preview = document.getElementById('photoPreview');
-    preview.src = ev.target.result;
-    preview.style.display = 'block';
-    document.getElementById('photoResult').style.display = 'block';
-    // Store base64 without prefix
-    state.photoData = ev.target.result.split(',')[1];
+    // 画像を圧縮してからbase64に変換
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const MAX = 800;
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > MAX) { h = h * MAX / w; w = MAX; } }
+      else       { if (h > MAX) { w = w * MAX / h; h = MAX; } }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const compressed = canvas.toDataURL('image/jpeg', 0.7);
+
+      const preview = document.getElementById('photoPreview');
+      preview.src = compressed;
+      preview.style.display = 'block';
+      document.getElementById('photoResult').style.display = 'block';
+      state.photoData = compressed.split(',')[1];
+    };
+    img.src = ev.target.result;
   };
   reader.readAsDataURL(file);
 }
