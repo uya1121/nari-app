@@ -1583,19 +1583,11 @@ function addAIMessage(text, mealCard = null) {
   div.appendChild(msg);
 
   if (mealCard) {
+    const cardId = 'card_' + Date.now() + '_' + Math.random().toString(36).slice(2);
     const card = document.createElement('div');
     card.className = 'msg-meal-card';
-    card.innerHTML = `<div class="msg-meal-name">${mealCard.name}</div>
-      <div class="msg-nutrients">
-        <div class="msg-nutrient">🔥 <span>${mealCard.calories}</span> kcal</div>
-        <div class="msg-nutrient">💪 P: <span>${mealCard.protein}g</span></div>
-        <div class="msg-nutrient">🌾 C: <span>${mealCard.carbs}g</span></div>
-        <div class="msg-nutrient">🥑 F: <span>${mealCard.fat}g</span></div>
-      </div>
-      <button onclick="recordMealFromCard(${JSON.stringify(mealCard).replace(/"/g, '&quot;')})"
-        style="margin-top:10px;padding:8px 14px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">
-        ✅ 記録する
-      </button>`;
+    card.id = cardId;
+    card.innerHTML = buildMealCardHTML(mealCard, cardId);
     div.appendChild(card);
   }
 
@@ -1606,6 +1598,83 @@ function addAIMessage(text, mealCard = null) {
 
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
+}
+
+function buildMealCardHTML(meal, cardId) {
+  const d = JSON.stringify(meal).replace(/"/g, '&quot;');
+  return `
+    <div class="msg-meal-name">${meal.emoji||'🍽️'} ${meal.name}</div>
+    <div class="msg-nutrients">
+      <div class="msg-nutrient">🔥 <span>${meal.calories}</span> kcal</div>
+      <div class="msg-nutrient">💪 P: <span>${meal.protein}g</span></div>
+      <div class="msg-nutrient">🌾 C: <span>${meal.carbs}g</span></div>
+      <div class="msg-nutrient">🥑 F: <span>${meal.fat}g</span></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button onclick="recordMealFromCard(${d})"
+        style="flex:1;padding:8px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">
+        ✅ 記録する
+      </button>
+      <button onclick="editMealCard('${cardId}', ${d})"
+        style="padding:8px 12px;background:var(--gray-100);border:1px solid var(--gray-200);border-radius:8px;font-size:13px;cursor:pointer;font-family:var(--font)">
+        ✏️ 編集
+      </button>
+    </div>`;
+}
+
+function editMealCard(cardId, meal) {
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  card.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <input id="edit_name_${cardId}" value="${meal.name}" placeholder="食品名"
+        style="padding:6px 10px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:var(--font)">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <label style="font-size:12px;color:var(--gray-500)">🔥 カロリー(kcal)
+          <input id="edit_cal_${cardId}" type="number" value="${meal.calories}"
+            style="width:100%;margin-top:2px;padding:5px 8px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:var(--font)">
+        </label>
+        <label style="font-size:12px;color:var(--gray-500)">💪 タンパク質(g)
+          <input id="edit_p_${cardId}" type="number" value="${meal.protein}"
+            style="width:100%;margin-top:2px;padding:5px 8px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:var(--font)">
+        </label>
+        <label style="font-size:12px;color:var(--gray-500)">🌾 炭水化物(g)
+          <input id="edit_c_${cardId}" type="number" value="${meal.carbs}"
+            style="width:100%;margin-top:2px;padding:5px 8px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:var(--font)">
+        </label>
+        <label style="font-size:12px;color:var(--gray-500)">🥑 脂質(g)
+          <input id="edit_f_${cardId}" type="number" value="${meal.fat}"
+            style="width:100%;margin-top:2px;padding:5px 8px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:var(--font)">
+        </label>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button onclick="saveMealCardEdit('${cardId}', ${JSON.stringify(meal).replace(/"/g, '&quot;')})"
+          style="flex:1;padding:8px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">
+          ✅ 保存して記録
+        </button>
+        <button onclick="cancelMealCardEdit('${cardId}', ${JSON.stringify(meal).replace(/"/g, '&quot;')})"
+          style="padding:8px 12px;background:var(--gray-100);border:1px solid var(--gray-200);border-radius:8px;font-size:13px;cursor:pointer;font-family:var(--font)">
+          キャンセル
+        </button>
+      </div>
+    </div>`;
+}
+
+function saveMealCardEdit(cardId, originalMeal) {
+  const edited = {
+    ...originalMeal,
+    name:     document.getElementById('edit_name_' + cardId).value || originalMeal.name,
+    calories: parseFloat(document.getElementById('edit_cal_'  + cardId).value) || 0,
+    protein:  parseFloat(document.getElementById('edit_p_'    + cardId).value) || 0,
+    carbs:    parseFloat(document.getElementById('edit_c_'    + cardId).value) || 0,
+    fat:      parseFloat(document.getElementById('edit_f_'    + cardId).value) || 0,
+  };
+  recordMealFromCard(edited);
+  document.getElementById(cardId).innerHTML = buildMealCardHTML(edited, cardId);
+}
+
+function cancelMealCardEdit(cardId, meal) {
+  document.getElementById(cardId).innerHTML = buildMealCardHTML(meal, cardId);
 }
 
 function addUserMessage(text) {
