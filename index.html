@@ -1966,26 +1966,35 @@ function handlePhoto(e) {
 }
 
 async function analyzePhoto() {
-  if (!state.photoData) return;
+  if (!state.photoData) { showToast('写真を選んでください'); return; }
 
   closeModal();
   showPage('chat');
   addUserMessage('📸 写真から食事を認識中...');
   showTyping();
 
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('タイムアウト（15秒）')), 15000)
+  );
+
   try {
-    const result = await callClaudeForMeal('写真の食事を分析してください', state.photoData);
+    const result = await Promise.race([
+      callClaudeForMeal('写真の食事を分析してください', state.photoData),
+      timeoutPromise
+    ]);
     removeTyping();
-    if (result.meals && result.meals.length > 0) {
-      for (const meal of result.meals) {
-        addAIMessage(result.comment || '写真から認識しました！', meal);
-      }
+    if (result.type === 'meal' && result.meals && result.meals.length > 0) {
+      addAIMessage(result.comment || '写真から認識しました！');
+      for (const meal of result.meals) { addAIMessage('', meal); }
+    } else if (result.meals && result.meals.length > 0) {
+      addAIMessage(result.comment || '写真から認識しました！');
+      for (const meal of result.meals) { addAIMessage('', meal); }
+    } else {
+      addAIMessage('食事を認識できませんでした。テキストで入力してみてください。');
     }
   } catch (e) {
     removeTyping();
-    addAIMessage('写真認識エラー：' + (e.message || '不明') + '\nデモとして記録します。');
-    const demo = { name: '食事（写真）', calories: 400, protein: 15, carbs: 55, fat: 12, vitaminC: 10, iron: 1.0, emoji: '🍱' };
-    setTimeout(() => addAIMessage('', demo), 300);
+    addAIMessage('写真認識エラー：' + (e.message || '不明'));
   }
 }
 
