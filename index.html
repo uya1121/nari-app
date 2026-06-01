@@ -1140,11 +1140,12 @@
     <div class="modal-title">📸 写真で食事を認識</div>
     <img id="photoPreview" class="photo-preview" alt="preview">
     <div class="form-group">
-      <input type="file" id="photoInput" accept="image/*" capture="environment"
-        onchange="handlePhoto(event)" style="display:none">
-      <button class="btn-primary" onclick="document.getElementById('photoInput').click()">
+      <input type="file" id="photoInput" accept="image/*"
+        onchange="handlePhoto(event)"
+        style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
+      <label for="photoInput" class="btn-primary" style="display:block;text-align:center;cursor:pointer">
         📷 写真を選ぶ / 撮影する
-      </button>
+      </label>
     </div>
     <div id="photoResult" style="display:none">
       <button class="btn-primary" id="analyzeBtn" onclick="analyzePhoto()" style="margin-top:10px">
