@@ -1732,6 +1732,31 @@ function guessMealDemo(text) {
   return { name: text.slice(0, 20), calories: 300, protein: 10, carbs: 40, fat: 8, vitaminC: 5, iron: 0.5, emoji: '🍽️' };
 }
 
+function deleteMeal(id, dateStr) {
+  if (!confirm('この食事記録を削除しますか？')) return;
+  state.meals = state.meals.filter(m => m.id !== id);
+  save();
+  showToast('🗑️ 削除しました');
+  showUnifiedDayDetail(dateStr);
+  renderUnifiedCalendar();
+}
+
+function moveMealDate(id, currentDateStr) {
+  const newDate = prompt('移動先の日付を入力してください（例：2026-05-30）', currentDateStr);
+  if (!newDate || !/^\d{4}-\d{2}-\d{2}$/.test(newDate)) {
+    if (newDate !== null) alert('日付の形式が正しくありません（例：2026-05-30）');
+    return;
+  }
+  const meal = state.meals.find(m => m.id === id);
+  if (meal) {
+    meal.date = newDate;
+    save();
+    showToast('📅 日付を変更しました');
+    showUnifiedDayDetail(currentDateStr);
+    renderUnifiedCalendar();
+  }
+}
+
 function getRecordDate() {
   const picker = document.getElementById('chatDatePicker');
   return (picker && picker.value) ? picker.value : todayStr();
@@ -2196,10 +2221,12 @@ function showUnifiedDayDetail(dateStr) {
         🍽️ 食事 <span style="float:right;color:var(--gray-900)">${totalMealKcal} kcal</span>
       </div>
       ${dayMeals.map(m => `
-        <div style="display:flex;align-items:center;gap:8px;padding:4px 0">
+        <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--gray-100)">
           <span style="font-size:18px">${m.emoji||'🍽️'}</span>
           <span style="font-size:14px;flex:1">${m.name}</span>
-          <span style="font-size:13px;color:var(--gray-400)">${m.calories||0} kcal</span>
+          <span style="font-size:12px;color:var(--gray-400);margin-right:4px">${m.calories||0} kcal</span>
+          <button onclick="moveMealDate(${m.id},'${dateStr}')" style="font-size:11px;padding:3px 7px;border:1px solid var(--gray-300);border-radius:8px;background:#fff;color:var(--gray-600);cursor:pointer">📅</button>
+          <button onclick="deleteMeal(${m.id},'${dateStr}')" style="font-size:11px;padding:3px 7px;border:1px solid #fcc;border-radius:8px;background:#fff;color:var(--red);cursor:pointer">🗑️</button>
         </div>`).join('')}
     </div>`;
   }
