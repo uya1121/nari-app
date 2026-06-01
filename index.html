@@ -1605,7 +1605,7 @@ async function sendMessage() {
     }
   } catch (e) {
     removeTyping();
-    addAIMessage('AIに接続できませんでした。APIキーを設定してください。\n\nデモモード：食事名をそのまま記録します。');
+    addAIMessage('AIエラー：' + (e.message || '不明') + '\n\nデモモードで記録します。');
     // Demo fallback
     const demo = guessMealDemo(text);
     if (demo) {
@@ -1661,7 +1661,10 @@ JSON形式で返答してください：
     body: JSON.stringify({ messages, systemPrompt })
   });
 
-  if (!res.ok) throw new Error('API error');
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error('HTTP ' + res.status + ': ' + errText);
+  }
   const data = await res.json();
 
   const text = data.content[0].text;
