@@ -1700,6 +1700,29 @@ async function callClaudeForMeal(userText, imageBase64 = null) {
   const apiKey = await getApiKey();
   if (apiKey === 'demo') throw new Error('no key');
 
+  const photoSystemPrompt = `あなたは栄養管理AIです。写真に写っている食事を分析してください。
+必ず以下のJSON形式のみで返答してください：
+{
+  "type": "meal",
+  "meals": [
+    {
+      "name": "食品名",
+      "calories": カロリー数値,
+      "protein": タンパク質(g),
+      "carbs": 炭水化物(g),
+      "fat": 脂質(g),
+      "vitaminC": ビタミンC(mg),
+      "iron": 鉄分(mg),
+      "zinc": 亜鉛(mg),
+      "vitaminE": ビタミンE(mg),
+      "biotin": ビオチン(μg),
+      "emoji": "絵文字1文字"
+    }
+  ],
+  "comment": "写真の食事への一言コメント（50字以内）"
+}
+写真が不明瞭でも推測して必ずJSONを返してください。`;
+
   const systemPrompt = `あなたは栄養・健康管理AIアシスタント「ナリ」です。
 ユーザーのメッセージが「食事の記録」か「質問・相談」かを判断し、以下のJSON形式で返答してください。
 
@@ -1752,7 +1775,7 @@ async function callClaudeForMeal(userText, imageBase64 = null) {
   const res = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ messages, systemPrompt }),
+    body: JSON.stringify({ messages, systemPrompt: imageBase64 ? photoSystemPrompt : systemPrompt }),
     signal: controller.signal
   }).finally(() => clearTimeout(timeout));
 
