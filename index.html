@@ -1672,18 +1672,21 @@ async function sendMessage() {
     const result = await callClaudeForMeal(text);
     removeTyping();
 
-    if (result.meals && result.meals.length > 0) {
+    if (result.type === 'chat') {
+      // 質問・相談モード
+      addAIMessage(result.reply || '...');
+    } else if (result.meals && result.meals.length > 0) {
+      // 食事記録モード
       addAIMessage(result.comment || '記録できました！');
       for (const meal of result.meals) {
         addAIMessage('', meal);
       }
     } else {
-      addAIMessage(result.comment || '食事の情報を教えていただけますか？');
+      addAIMessage(result.comment || result.reply || '食事の情報を教えていただけますか？');
     }
   } catch (e) {
     removeTyping();
     addAIMessage('AIエラー：' + (e.message || '不明') + '\n\nデモモードで記録します。');
-    // Demo fallback
     const demo = guessMealDemo(text);
     if (demo) {
       setTimeout(() => addAIMessage('', demo), 300);
@@ -1696,9 +1699,12 @@ async function callClaudeForMeal(userText, imageBase64 = null) {
   const apiKey = await getApiKey();
   if (apiKey === 'demo') throw new Error('no key');
 
-  const systemPrompt = `あなたは栄養管理AIです。ユーザーが食べた食事を教えてくれます。
-JSON形式で返答してください：
+  const systemPrompt = `あなたは栄養・健康管理AIアシスタント「ナリ」です。
+ユーザーのメッセージが「食事の記録」か「質問・相談」かを判断し、以下のJSON形式で返答してください。
+
+【食事の記録の場合】
 {
+  "type": "meal",
   "meals": [
     {
       "name": "食品名",
@@ -1714,10 +1720,17 @@ JSON形式で返答してください：
       "emoji": "絵文字1文字"
     }
   ],
-  "comment": "親しみやすいコメント（栄養的なアドバイスを含む、100字以内）"
+  "comment": "親しみやすいコメント（栄養アドバイスを含む、100字以内）"
 }
-複数の食品が含まれる場合はmeals配列に複数要素を入れてください。
-数値は日本食品標準成分表に基づいた推定値で構いません。`;
+
+【質問・相談・雑談の場合】
+{
+  "type": "chat",
+  "reply": "丁寧で親しみやすい返答（200字以内）"
+}
+
+数値は日本食品標準成分表に基づいた推定値で構いません。
+複数の食品が含まれる場合はmeals配列に複数入れてください。`;
 
   const messages = [];
   if (imageBase64) {
