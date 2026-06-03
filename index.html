@@ -831,6 +831,23 @@
     display: grid; grid-template-columns: repeat(7, 1fr);
     gap: 2px;
   }
+
+  /* ===== カレンダースワイプ用 ===== */
+  .cal-viewport {
+    overflow: hidden;
+    position: relative;
+    touch-action: pan-y;   /* ブラウザは縦スクロールのみ担当、横はJS */
+  }
+  .cal-track {
+    display: flex;
+    width: 300%;           /* 3パネル分 */
+    transform: translateX(-33.333%);
+    will-change: transform;
+  }
+  .cal-panel {
+    width: 33.333%;        /* 1パネル = viewport幅 */
+    flex-shrink: 0;
+  }
   .cal-dow {
     text-align: center; font-size: 11px; font-weight: 600;
     color: var(--ink-faint); padding: 4px 0;
@@ -1261,7 +1278,13 @@
       <div class="cal-month-label" id="calMonthLabel"></div>
       <button class="cal-nav" onclick="calMove(1)">›</button>
     </div>
-    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-viewport" id="calViewport">
+      <div class="cal-track" id="calTrack">
+        <div class="cal-panel cal-grid" id="calGrid-prev"></div>
+        <div class="cal-panel cal-grid" id="calGrid-curr"></div>
+        <div class="cal-panel cal-grid" id="calGrid-next"></div>
+      </div>
+    </div>
 
     <!-- 凡例 -->
     <div style="display:flex;gap:14px;margin:12px 0 16px;flex-wrap:wrap">
@@ -2602,48 +2625,18 @@ function renderWorkout() {
 
 // ===== 統合カレンダー =====
 
-function calMove(delta) {
-  calMonth += delta;
-  if (calMonth > 11) { calMonth = 0; calYear++; }
-  if (calMonth < 0)  { calMonth = 11; calYear--; }
-  renderUnifiedCalendar();
-}
-
-// カレンダースワイプ
-(function initCalSwipe() {
-  let startX = 0, startY = 0;
-  const THRESHOLD = 50;
-
-  document.addEventListener('touchstart', e => {
-    if (!document.getElementById('page-calendar').classList.contains('active')) return;
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-  }, { passive: true });
-
-  document.addEventListener('touchend', e => {
-    if (!document.getElementById('page-calendar').classList.contains('active')) return;
-    const dx = e.changedTouches[0].clientX - startX;
-    const dy = e.changedTouches[0].clientY - startY;
-    if (Math.abs(dx) < THRESHOLD || Math.abs(dy) > Math.abs(dx)) return;
-    calMove(dx < 0 ? 1 : -1);
-  }, { passive: true });
-})();
-
-function renderUnifiedCalendar() {
-  const today = new Date();
-  document.getElementById('calMonthLabel').textContent = `${calYear}年${calMonth + 1}月`;
-
-  // 当月のアクティビティを集計
-  const mm = String(calMonth + 1).padStart(2, '0');
-  const prefix = `${calYear}-${mm}-`;
+// ─── 1ヶ月分のHTML生成 ───
+function _getMonthHTML(year, month) {
+  const today   = new Date();
+  const mm      = String(month + 1).padStart(2, '0');
+  const prefix  = `${year}-${mm}-`;
 
   const workoutDays = new Set(state.workouts.filter(w => w.date.startsWith(prefix)).map(w => w.date));
-  const mealDays    = new Set(state.meals.filter(m => m.date.startsWith(prefix)).map(m => m.date));
-  const weightDays  = new Set(state.weights.filter(w => w.date.startsWith(prefix)).map(w => w.date));
+  const mealDays    = new Set(state.meals.filter(m    => m.date.startsWith(prefix)).map(m => m.date));
 
-  const firstDay    = new Date(calYear, calMonth, 1).getDay();
-  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-  const daysInPrev  = new Date(calYear, calMonth, 0).getDate();
+  const firstDay    = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrev  = new Date(year, month, 0).getDate();
 
   const DOW = ['日','月','火','水','木','金','土'];
   let html = DOW.map(d => `<div class="cal-dow">${d}</div>`).join('');
@@ -2653,31 +2646,189 @@ function renderUnifiedCalendar() {
   }
 
   for (let d = 1; d <= daysInMonth; d++) {
-    const dateStr = `${calYear}-${mm}-${String(d).padStart(2, '0')}`;
-    const isToday  = today.getFullYear() === calYear && today.getMonth() === calMonth && today.getDate() === d;
-    const hasWk    = workoutDays.has(dateStr);
-    const hasMeal  = mealDays.has(dateStr);
+    const dateStr = `${year}-${mm}-${String(d).padStart(2, '0')}`;
+    const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === d;
+    const hasWk   = workoutDays.has(dateStr);
+    const hasMeal = mealDays.has(dateStr);
 
     let cls = 'cal-day';
     if (isToday && !hasWk && !hasMeal) cls += ' today';
-    if (hasWk)   cls += ' has-workout';
-    if (!hasWk && hasMeal) cls += ' has-meal';
-    if (isToday && (hasWk || hasMeal)) cls += ' today-active';
+    if (hasWk)                          cls += ' has-workout';
+    if (!hasWk && hasMeal)              cls += ' has-meal';
+    if (isToday && (hasWk || hasMeal))  cls += ' today-active';
 
     html += `<div class="${cls}" onclick="showUnifiedDayDetail('${dateStr}')">${d}</div>`;
   }
 
   const total = firstDay + daysInMonth;
-  const rem = total % 7 === 0 ? 0 : 7 - (total % 7);
+  const rem   = total % 7 === 0 ? 0 : 7 - (total % 7);
   for (let i = 1; i <= rem; i++) html += `<div class="cal-day other-month">${i}</div>`;
 
-  document.getElementById('calGrid').innerHTML = html;
+  return html;
+}
 
-  // 今日の詳細を自動で開く
-  const todayStr2 = `${calYear}-${mm}-${String(today.getDate()).padStart(2,'0')}`;
+// ─── 前月・当月・翌月の3パネルを一括描画 ───
+function _renderCalPanels() {
+  const prevM = calMonth === 0  ? 11 : calMonth - 1;
+  const prevY = calMonth === 0  ? calYear - 1 : calYear;
+  const nextM = calMonth === 11 ? 0  : calMonth + 1;
+  const nextY = calMonth === 11 ? calYear + 1 : calYear;
+
+  document.getElementById('calGrid-prev').innerHTML = _getMonthHTML(prevY, prevM);
+  document.getElementById('calGrid-curr').innerHTML = _getMonthHTML(calYear, calMonth);
+  document.getElementById('calGrid-next').innerHTML = _getMonthHTML(nextY, nextM);
+
+  document.getElementById('calMonthLabel').textContent = `${calYear}年${calMonth + 1}月`;
+}
+
+// ─── 今日の詳細を自動表示（当月のみ） ───
+function _updateCalDayDetail() {
+  const today = new Date();
   if (today.getFullYear() === calYear && today.getMonth() === calMonth) {
-    showUnifiedDayDetail(todayStr2);
+    const mm = String(calMonth + 1).padStart(2, '0');
+    showUnifiedDayDetail(`${calYear}-${mm}-${String(today.getDate()).padStart(2, '0')}`);
+  } else {
+    document.getElementById('calDayDetail').innerHTML = '';
   }
+}
+
+// ─── アニメーション中フラグ（連打防止） ───
+let _calBusy = false;
+
+// ─── ボタン押下での月移動（スライドアニメーション付き） ───
+function calMove(delta) {
+  if (_calBusy) return;
+  _calBusy = true;
+
+  const vp    = document.getElementById('calViewport');
+  const track = document.getElementById('calTrack');
+  if (!track || !vp) { _calBusy = false; return; }
+
+  const vw     = vp.offsetWidth;
+  const target = -delta * vw; // 次月(+1)→左へ(-vw)、前月(-1)→右へ(+vw)
+
+  track.style.transition = 'transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+  track.style.transform  = `translateX(calc(-33.333% + ${target}px))`;
+
+  setTimeout(() => {
+    calMonth += delta;
+    if (calMonth > 11) { calMonth = 0;  calYear++; }
+    if (calMonth < 0)  { calMonth = 11; calYear--; }
+    _renderCalPanels();
+    track.style.transition = 'none';
+    track.style.transform  = 'translateX(-33.333%)';
+    _updateCalDayDetail();
+    _calBusy = false;
+  }, 400);
+}
+
+// ─── タッチ追従スワイプ（ヌルヌル感） ───
+(function initCalSwipe() {
+  let startX = 0, startY = 0, startTime = 0;
+  let isDragging = false, isHorizontal = null;
+
+  const vp    = () => document.getElementById('calViewport');
+  const track = () => document.getElementById('calTrack');
+
+  function setPos(px, animated) {
+    const t = track(); if (!t) return;
+    t.style.transition = animated
+      ? 'transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+      : 'none';
+    t.style.transform = `translateX(calc(-33.333% + ${px}px))`;
+  }
+
+  document.addEventListener('touchstart', e => {
+    if (!document.getElementById('page-calendar').classList.contains('active')) return;
+    const v = vp();
+    if (!v || !v.contains(e.target)) return; // カレンダーグリッド外は無視
+    if (_calBusy) return;
+
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    startTime  = Date.now();
+    isDragging = true;
+    isHorizontal = null;
+    setPos(0, false); // 進行中アニメーションをキャンセル
+  }, { passive: true });
+
+  document.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+
+    const dx = e.touches[0].clientX - startX;
+    const dy = e.touches[0].clientY - startY;
+
+    // 最初の動きで横方向か縦方向かを判定
+    if (isHorizontal === null && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+      isHorizontal = Math.abs(dx) > Math.abs(dy);
+    }
+    if (!isHorizontal) return;
+
+    // 指に追従 + 端に達したらゴム感（減衰）
+    const w = vp()?.offsetWidth || 375;
+    let x = dx;
+    if (Math.abs(dx) > w) {
+      x = Math.sign(dx) * (w + (Math.abs(dx) - w) * 0.12);
+    }
+    setPos(x, false);
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+    if (!isDragging) return;
+    isDragging = false;
+    if (!isHorizontal) { isHorizontal = null; return; }
+
+    const dx       = e.changedTouches[0].clientX - startX;
+    const elapsed  = Date.now() - startTime;
+    const velocity = elapsed > 0 ? Math.abs(dx) / elapsed : 0;
+    const w        = vp()?.offsetWidth || 375;
+    const doSwipe  = Math.abs(dx) > 60 || velocity > 0.3;
+
+    isHorizontal = null;
+
+    if (_calBusy) { setPos(0, true); return; }
+
+    if (doSwipe && dx > 0) {
+      // 右スワイプ → 前月へ
+      _calBusy = true;
+      setPos(w, true);
+      setTimeout(() => {
+        calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; }
+        _renderCalPanels();
+        const t = track();
+        if (t) { t.style.transition = 'none'; t.style.transform = 'translateX(-33.333%)'; }
+        _updateCalDayDetail();
+        _calBusy = false;
+      }, 400);
+    } else if (doSwipe && dx < 0) {
+      // 左スワイプ → 次月へ
+      _calBusy = true;
+      setPos(-w, true);
+      setTimeout(() => {
+        calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; }
+        _renderCalPanels();
+        const t = track();
+        if (t) { t.style.transition = 'none'; t.style.transform = 'translateX(-33.333%)'; }
+        _updateCalDayDetail();
+        _calBusy = false;
+      }, 400);
+    } else {
+      setPos(0, true); // スナップバック（スワイプ量が足りない場合）
+    }
+  }, { passive: true });
+})();
+
+// ─── 後方互換（addWorkoutから呼ばれているrenderCalendar()） ───
+function renderCalendar() { renderUnifiedCalendar(); }
+
+function renderUnifiedCalendar() {
+  const track = document.getElementById('calTrack');
+  if (track) {
+    track.style.transition = 'none';
+    track.style.transform  = 'translateX(-33.333%)';
+  }
+  _renderCalPanels();
+  _updateCalDayDetail();
 }
 
 function showUnifiedDayDetail(dateStr) {
