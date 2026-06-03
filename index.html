@@ -303,21 +303,17 @@
 
   .ring-svg { width: 140px; height: 140px; transform: rotate(-90deg); }
 
-  .ring-bg { fill: none; stroke: var(--parchment); stroke-width: 12; }
+  .ring-bg { fill: none; stroke: #e5e5ea; stroke-width: 10; }
 
   .ring-fill {
     fill: none; stroke: var(--green);
-    stroke-width: 12; stroke-linecap: round;
+    stroke-width: 10; stroke-linecap: round;
     stroke-dasharray: 339;
     stroke-dashoffset: 339;
     transition: stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1);
-    filter: drop-shadow(0 0 6px rgba(29,158,117,0.4));
   }
 
-  .ring-fill.over {
-    stroke: var(--red);
-    filter: drop-shadow(0 0 6px rgba(226,75,74,0.4));
-  }
+  .ring-fill.over { stroke: var(--red); }
 
   .ring-center {
     position: absolute; inset: 0;
@@ -326,27 +322,27 @@
   }
 
   .ring-num {
-    font-size: 36px; font-weight: 700;
-    line-height: 1; letter-spacing: -1.5px;
+    font-size: 38px; font-weight: 700;
+    line-height: 1; letter-spacing: -2px;
     color: var(--ink);
   }
 
-  .ring-unit { font-size: 11px; color: var(--ink-faint); margin-top: 2px; letter-spacing: 0.2px; }
+  .ring-unit { font-size: 11px; color: var(--ink-faint); margin-top: 3px; letter-spacing: 0.2px; }
 
   /* Three-column stats below ring */
   .calorie-stats {
     display: grid; grid-template-columns: repeat(3, 1fr);
     width: 100%; gap: 0;
-    border-top: 1px solid var(--hairline-soft);
-    padding-top: 16px;
+    border-top: 1px solid #e5e5ea;
+    padding-top: 18px;
   }
 
   .calorie-stat-item {
-    display: flex; flex-direction: column; align-items: center; gap: 3px;
-    padding: 0 8px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 0 4px;
   }
   .calorie-stat-item:not(:last-child) {
-    border-right: 1px solid var(--hairline-soft);
+    border-right: 1px solid #e5e5ea;
   }
 
   .calorie-stat-label {
@@ -355,21 +351,21 @@
   }
 
   .calorie-stat-val {
-    font-size: 20px; font-weight: 700;
-    color: var(--ink); letter-spacing: -0.8px; line-height: 1.1;
+    font-size: 22px; font-weight: 700;
+    color: var(--ink); letter-spacing: -1px; line-height: 1;
   }
 
   .calorie-stat-unit { font-size: 10px; color: var(--ink-faint); }
 
   /* Progress bar */
   .calorie-bar-wrap {
-    height: 4px; background: var(--parchment);
+    height: 3px; background: #e5e5ea;
     border-radius: 2px; overflow: hidden;
-    margin-top: 14px;
+    margin-top: 18px;
   }
 
   .calorie-bar {
-    height: 100%; background: linear-gradient(90deg, var(--green), #34d399);
+    height: 100%; background: var(--green);
     border-radius: 2px;
     transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
   }
@@ -388,25 +384,33 @@
 
   .nutrient-card {
     background: var(--canvas);
-    border-radius: 22px;
-    padding: 16px 8px 14px;
+    border-radius: 20px;
+    padding: 0 0 14px;
     text-align: center;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
-    position: relative; overflow: hidden;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    overflow: hidden;
+  }
+
+  .nutrient-card::before {
+    content: ''; display: block;
+    height: 3px; background: var(--green);
+    border-radius: 0; margin-bottom: 14px;
   }
 
   .nutrient-name {
     font-size: 10px; color: var(--ink-faint);
-    margin-bottom: 10px; letter-spacing: 0.5px;
-    font-weight: 600; text-transform: uppercase;
+    margin-bottom: 8px; letter-spacing: 0.3px;
+    font-weight: 600;
+    padding: 0 8px;
   }
   .nutrient-val {
-    font-size: 32px; font-weight: 700;
+    font-size: 30px; font-weight: 700;
     letter-spacing: -1.5px; line-height: 1;
-    display: block;
+    display: block; color: var(--ink);
+    padding: 0 4px;
   }
   .nutrient-unit { font-size: 11px; color: var(--ink-faint); margin-top: 3px; display: block; }
-  .nutrient-sub { font-size: 10px; color: var(--ink-faint); margin-top: 5px; display: block; }
+  .nutrient-sub { font-size: 10px; color: var(--ink-faint); margin-top: 4px; display: block; padding: 0 8px; }
 
   /* Meal list */
   .section-header {
@@ -1400,14 +1404,14 @@ let state = {
 
 // ===== 栄養素定義 =====
 const NUTRIENT_DEFS = {
-  protein:  { label: 'タンパク質', unit: 'g',  color: '--blue',    precision: 0, getTarget: () => getTargetProtein() },
-  carbs:    { label: '炭水化物',   unit: 'g',  color: '--ink-muted', precision: 0, getTarget: null },
-  fat:      { label: '脂質',       unit: 'g',  color: '--ink-muted', precision: 1, getTarget: null },
-  vitaminC: { label: 'ビタミンC',  unit: 'mg', color: '--amber',   precision: 0, getTarget: () => 100 },
-  iron:     { label: '鉄分',       unit: 'mg', color: '--pink',    precision: 1, getTarget: () => state.user?.gender === 'female' ? 10.5 : 7.5 },
-  zinc:     { label: '亜鉛',       unit: 'mg', color: '--green',   precision: 1, getTarget: () => state.user?.gender === 'female' ? 8 : 11 },
-  vitaminE: { label: 'ビタミンE',  unit: 'mg', color: '--amber',   precision: 1, getTarget: () => 6.5 },
-  biotin:   { label: 'ビオチン',   unit: 'μg', color: '--pink',    precision: 0, getTarget: () => 50 },
+  protein:  { label: 'タンパク質', unit: 'g',  color: '--ink', precision: 0, getTarget: () => getTargetProtein() },
+  carbs:    { label: '炭水化物',   unit: 'g',  color: '--ink', precision: 0, getTarget: null },
+  fat:      { label: '脂質',       unit: 'g',  color: '--ink', precision: 1, getTarget: null },
+  vitaminC: { label: 'ビタミンC',  unit: 'mg', color: '--ink', precision: 0, getTarget: () => 100 },
+  iron:     { label: '鉄分',       unit: 'mg', color: '--ink', precision: 1, getTarget: () => state.user?.gender === 'female' ? 10.5 : 7.5 },
+  zinc:     { label: '亜鉛',       unit: 'mg', color: '--ink', precision: 1, getTarget: () => state.user?.gender === 'female' ? 8 : 11 },
+  vitaminE: { label: 'ビタミンE',  unit: 'mg', color: '--ink', precision: 1, getTarget: () => 6.5 },
+  biotin:   { label: 'ビオチン',   unit: 'μg', color: '--ink', precision: 0, getTarget: () => 50 },
 };
 
 // ===== 栄養素ピッカー =====
@@ -1647,11 +1651,11 @@ function renderHome() {
     const pct = tgt ? Math.min(val / tgt * 100, 100) : null;
     return `<div class="nutrient-card">
       <div class="nutrient-name">${def.label}</div>
-      <div class="nutrient-val" style="color:var(${def.color})">${val.toFixed(def.precision)}</div>
+      <div class="nutrient-val">${val.toFixed(def.precision)}</div>
       <div class="nutrient-unit">${def.unit}</div>
       ${tgt ? `<div class="nutrient-sub">目標 ${tgt}${def.unit}</div>
-        <div style="margin-top:4px;height:3px;background:var(--hairline);border-radius:2px;overflow:hidden">
-          <div style="height:100%;width:${pct}%;background:var(${def.color});border-radius:2px;transition:width 0.6s"></div>
+        <div style="margin-top:5px;height:3px;background:var(--hairline);border-radius:2px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:var(--green);border-radius:2px;transition:width 0.6s"></div>
         </div>` : ''}
     </div>`;
   }).join('');
