@@ -2708,7 +2708,7 @@ function calMove(delta) {
   const target = -delta * vw; // 次月(+1)→左へ(-vw)、前月(-1)→右へ(+vw)
 
   track.style.transition = 'transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-  track.style.transform  = `translateX(calc(-33.333% + ${target}px))`;
+  track.style.transform  = `translateX(${-vw + target}px)`;
 
   setTimeout(() => {
     calMonth += delta;
@@ -2716,7 +2716,7 @@ function calMove(delta) {
     if (calMonth < 0)  { calMonth = 11; calYear--; }
     _renderCalPanels();
     track.style.transition = 'none';
-    track.style.transform  = 'translateX(-33.333%)';
+    track.style.transform  = `translateX(${-vw}px)`;
     _updateCalDayDetail();
     _calBusy = false;
   }, 400);
@@ -2731,11 +2731,12 @@ function calMove(delta) {
   const track = () => document.getElementById('calTrack');
 
   function setPos(px, animated) {
-    const t = track(); if (!t) return;
+    const v = vp(); const t = track(); if (!v || !t) return;
+    const w = v.offsetWidth;
     t.style.transition = animated
       ? 'transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
       : 'none';
-    t.style.transform = `translateX(calc(-33.333% + ${px}px))`;
+    t.style.transform = `translateX(${-w + px}px)`;
   }
 
   document.addEventListener('touchstart', e => {
@@ -2796,7 +2797,7 @@ function calMove(delta) {
         calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; }
         _renderCalPanels();
         const t = track();
-        if (t) { t.style.transition = 'none'; t.style.transform = 'translateX(-33.333%)'; }
+        if (t) { const _w = vp()?.offsetWidth||375; t.style.transition='none'; t.style.transform=`translateX(${-_w}px)`; }
         _updateCalDayDetail();
         _calBusy = false;
       }, 400);
@@ -2808,7 +2809,7 @@ function calMove(delta) {
         calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; }
         _renderCalPanels();
         const t = track();
-        if (t) { t.style.transition = 'none'; t.style.transform = 'translateX(-33.333%)'; }
+        if (t) { const _w = vp()?.offsetWidth||375; t.style.transition='none'; t.style.transform=`translateX(${-_w}px)`; }
         _updateCalDayDetail();
         _calBusy = false;
       }, 400);
@@ -2822,10 +2823,15 @@ function calMove(delta) {
 function renderCalendar() { renderUnifiedCalendar(); }
 
 function renderUnifiedCalendar() {
+  const vp    = document.getElementById('calViewport');
   const track = document.getElementById('calTrack');
-  if (track) {
+  if (vp && track) {
+    const w = vp.offsetWidth;
+    // %計算の誤差を防ぐためpxで正確に設定
+    track.style.width = (w * 3) + 'px';
+    document.querySelectorAll('.cal-panel').forEach(p => p.style.width = w + 'px');
     track.style.transition = 'none';
-    track.style.transform  = 'translateX(-33.333%)';
+    track.style.transform  = `translateX(${-w}px)`;
   }
   _renderCalPanels();
   _updateCalDayDetail();
