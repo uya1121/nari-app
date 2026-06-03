@@ -6,35 +6,64 @@
 <title>ナリ / NARI</title>
 <style>
   :root {
+    /* ブランドカラー */
     --green: #1D9E75;
+    --green-dark: #178a65;
+    --green-light: #e8f7f2;
+
+    /* セマンティックカラー */
     --blue: #378ADD;
     --pink: #D4537E;
     --amber: #BA7517;
     --red: #E24B4A;
-    --gray-100: #F5F5F7;
-    --gray-200: #E5E5EA;
-    --gray-400: #AEAEB2;
-    --gray-600: #636366;
-    --gray-900: #1C1C1E;
-    --font: -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif;
+
+    /* Apple風サーフェス */
+    --canvas: #ffffff;
+    --parchment: #f5f5f7;
+    --hairline: #e0e0e0;
+    --hairline-soft: rgba(0,0,0,0.06);
+
+    /* テキスト */
+    --ink: #1d1d1f;
+    --ink-muted: #6e6e73;
+    --ink-faint: #aeaeb2;
+
+    /* 後方互換 */
+    --gray-50: #fafafa;
+    --gray-100: #f5f5f7;
+    --gray-200: #e0e0e0;
+    --gray-400: #aeaeb2;
+    --gray-500: #8e8e93;
+    --gray-600: #6e6e73;
+    --gray-700: #3a3a3c;
+    --gray-900: #1d1d1f;
+
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Hiragino Sans", sans-serif;
+
+    /* シェイプ */
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 18px;
+    --radius-pill: 9999px;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     font-family: var(--font);
-    background: #fff;
-    color: var(--gray-900);
+    background: var(--parchment);
+    color: var(--ink);
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
   }
 
   /* ===== ONBOARDING ===== */
   #onboarding {
     position: fixed; inset: 0;
-    background: #fff;
+    background: var(--canvas);
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    padding: 32px 24px;
+    padding: 40px 28px;
     z-index: 100;
   }
 
@@ -42,21 +71,24 @@
   .ob-step.active { display: block; }
 
   .ob-logo {
-    font-size: 28px; font-weight: 700;
-    letter-spacing: -0.5px;
-    margin-bottom: 8px;
+    font-size: 30px; font-weight: 600;
+    letter-spacing: -0.8px;
+    margin-bottom: 6px;
   }
 
   .ob-logo span { color: var(--green); }
 
   .ob-tagline {
-    font-size: 14px; color: var(--gray-600);
-    margin-bottom: 40px;
+    font-size: 15px; color: var(--ink-muted);
+    margin-bottom: 48px;
+    letter-spacing: 0.1px;
   }
 
   .ob-title {
-    font-size: 22px; font-weight: 700;
-    margin-bottom: 24px;
+    font-size: 24px; font-weight: 600;
+    letter-spacing: -0.374px;
+    margin-bottom: 28px;
+    color: var(--ink);
   }
 
   .ob-progress {
@@ -66,7 +98,7 @@
 
   .ob-dot {
     height: 4px; flex: 1; border-radius: 2px;
-    background: var(--gray-200);
+    background: var(--hairline);
     transition: background 0.3s;
   }
 
@@ -76,23 +108,26 @@
 
   .form-group label {
     display: block;
-    font-size: 12px; color: var(--gray-600);
+    font-size: 12px; color: var(--ink-muted);
     margin-bottom: 6px; font-weight: 500;
   }
 
   .form-group input, .form-group select {
     width: 100%;
-    padding: 12px 14px;
-    border: 1.5px solid var(--gray-200);
-    border-radius: 10px;
-    font-size: 16px;
+    padding: 13px 16px;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-md);
+    font-size: 17px;
     font-family: var(--font);
     outline: none;
+    background: var(--canvas);
+    color: var(--ink);
     transition: border-color 0.2s;
   }
 
   .form-group input:focus, .form-group select:focus {
     border-color: var(--green);
+    border-width: 1.5px;
   }
 
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -100,52 +135,56 @@
   .goal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
 
   .goal-card {
-    border: 2px solid var(--gray-200);
-    border-radius: 14px;
-    padding: 16px 12px;
+    border: 1.5px solid var(--hairline);
+    border-radius: var(--radius-lg);
+    padding: 20px 12px;
     cursor: pointer;
     text-align: center;
     transition: all 0.2s;
+    background: var(--canvas);
   }
 
   .goal-card:hover { border-color: var(--green); }
-  .goal-card.selected { border-color: var(--green); background: #F0FAF6; }
+  .goal-card.selected { border-color: var(--green); border-width: 2px; background: var(--green-light); }
 
   .goal-card .icon { font-size: 28px; margin-bottom: 6px; }
   .goal-card .label { font-size: 13px; font-weight: 600; }
-  .goal-card .sub { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+  .goal-card .sub { font-size: 11px; color: var(--ink-faint); margin-top: 2px; }
 
   .btn-primary {
     width: 100%;
-    padding: 14px;
+    padding: 15px;
     background: var(--green);
     color: #fff;
     border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
+    border-radius: var(--radius-pill);
+    font-size: 17px;
+    font-weight: 400;
+    letter-spacing: 0.1px;
     cursor: pointer;
     font-family: var(--font);
-    transition: opacity 0.2s;
+    transition: transform 0.15s, opacity 0.15s;
   }
 
-  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-primary:hover { opacity: 0.9; }
 
   .activity-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
 
   .activity-item {
-    border: 2px solid var(--gray-200);
-    border-radius: 10px;
-    padding: 12px 14px;
+    border: 1.5px solid var(--hairline);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
     cursor: pointer;
     transition: all 0.2s;
     display: flex; align-items: center; gap: 12px;
+    background: var(--canvas);
   }
 
   .activity-item:hover { border-color: var(--green); }
-  .activity-item.selected { border-color: var(--green); background: #F0FAF6; }
+  .activity-item.selected { border-color: var(--green); border-width: 2px; background: var(--green-light); }
   .activity-item .a-title { font-size: 14px; font-weight: 600; }
-  .activity-item .a-sub { font-size: 12px; color: var(--gray-400); }
+  .activity-item .a-sub { font-size: 12px; color: var(--ink-faint); }
 
   /* ===== MAIN APP ===== */
   #app { display: none; flex-direction: column; min-height: 100vh; }
@@ -154,50 +193,56 @@
   /* Header */
   .header {
     position: sticky; top: 0;
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--gray-200);
-    padding: 0 16px;
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--hairline-soft);
+    padding: 0 20px;
     height: 52px;
     display: flex; align-items: center; justify-content: space-between;
     z-index: 50;
   }
 
-  .header-logo { font-size: 18px; font-weight: 700; }
+  .header-logo {
+    font-size: 18px; font-weight: 600;
+    letter-spacing: -0.374px;
+    color: var(--ink);
+  }
   .header-logo span { color: var(--green); }
 
   .mode-toggle {
     display: flex;
-    background: var(--gray-100);
-    border-radius: 8px;
+    background: var(--parchment);
+    border-radius: var(--radius-pill);
     padding: 3px;
     gap: 2px;
   }
 
   .mode-btn {
-    padding: 4px 10px;
+    padding: 5px 12px;
     border: none;
     background: transparent;
-    border-radius: 6px;
-    font-size: 12px; font-weight: 600;
+    border-radius: var(--radius-pill);
+    font-size: 12px; font-weight: 500;
     cursor: pointer;
     font-family: var(--font);
-    color: var(--gray-600);
+    color: var(--ink-muted);
     transition: all 0.2s;
   }
 
   .mode-btn.active {
-    background: #fff;
-    color: var(--gray-900);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    background: var(--canvas);
+    color: var(--ink);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
   }
 
   /* Bottom nav */
   .bottom-nav {
     position: fixed; bottom: 0; left: 0; right: 0;
-    background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(12px);
-    border-top: 1px solid var(--gray-200);
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-top: 1px solid var(--hairline-soft);
     display: grid; grid-template-columns: repeat(4, 1fr);
     padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
     z-index: 50;
@@ -205,47 +250,52 @@
 
   .nav-item {
     display: flex; flex-direction: column;
-    align-items: center; gap: 3px;
+    align-items: center; gap: 2px;
     cursor: pointer;
-    padding: 4px;
+    padding: 4px 8px;
     border: none; background: transparent;
     font-family: var(--font);
+    transition: opacity 0.15s;
   }
 
-  .nav-item .nav-icon { font-size: 22px; }
-  .nav-item .nav-label { font-size: 10px; color: var(--gray-400); font-weight: 500; }
-  .nav-item.active .nav-label { color: var(--green); }
+  .nav-item:active { opacity: 0.6; }
+  .nav-item .nav-icon { font-size: 22px; line-height: 1; }
+  .nav-item .nav-label { font-size: 10px; color: var(--ink-faint); font-weight: 500; letter-spacing: -0.1px; }
+  .nav-item.active .nav-label { color: var(--green); font-weight: 600; }
   .nav-item.active .nav-icon { filter: none; }
 
   /* Pages */
-  .page { display: none; padding: 16px 16px 100px; }
+  .page { display: none; padding: 20px 20px 110px; background: var(--parchment); min-height: 100vh; }
   .page.active { display: block; }
 
   /* ===== HOME PAGE ===== */
   .date-label {
-    font-size: 13px; color: var(--gray-400);
-    margin-bottom: 4px;
+    font-size: 13px; color: var(--ink-faint);
+    margin-bottom: 4px; letter-spacing: -0.1px;
   }
 
   .page-title {
-    font-size: 22px; font-weight: 700;
-    margin-bottom: 20px;
+    font-size: 26px; font-weight: 600;
+    letter-spacing: -0.374px;
+    margin-bottom: 24px;
+    color: var(--ink);
   }
 
   /* Calorie ring */
   .calorie-card {
-    background: var(--gray-100);
-    border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 16px;
+    background: var(--canvas);
+    border-radius: var(--radius-lg);
+    padding: 20px 20px;
+    margin-bottom: 12px;
     display: flex; align-items: center; gap: 20px;
+    border: 1px solid var(--hairline-soft);
   }
 
   .ring-wrap { position: relative; width: 90px; height: 90px; flex-shrink: 0; }
 
   .ring-svg { width: 90px; height: 90px; transform: rotate(-90deg); }
 
-  .ring-bg { fill: none; stroke: var(--gray-200); stroke-width: 8; }
+  .ring-bg { fill: none; stroke: var(--hairline); stroke-width: 8; }
 
   .ring-fill {
     fill: none; stroke: var(--green);
@@ -264,15 +314,15 @@
   }
 
   .ring-num { font-size: 20px; font-weight: 700; line-height: 1; }
-  .ring-unit { font-size: 9px; color: var(--gray-400); }
+  .ring-unit { font-size: 9px; color: var(--ink-faint); }
 
   .calorie-detail { flex: 1; }
   .calorie-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
-  .calorie-label { font-size: 12px; color: var(--gray-600); }
+  .calorie-label { font-size: 12px; color: var(--ink-muted); }
   .calorie-val { font-size: 14px; font-weight: 600; }
 
   .calorie-bar-wrap {
-    height: 6px; background: var(--gray-200);
+    height: 6px; background: var(--hairline);
     border-radius: 3px; overflow: hidden;
   }
 
@@ -285,20 +335,21 @@
   /* Nutrient cards */
   .nutrient-grid {
     display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 10px; margin-bottom: 16px;
+    gap: 10px; margin-bottom: 12px;
   }
 
   .nutrient-card {
-    background: var(--gray-100);
-    border-radius: 14px;
-    padding: 12px;
+    background: var(--canvas);
+    border-radius: var(--radius-lg);
+    padding: 14px 10px;
     text-align: center;
+    border: 1px solid var(--hairline-soft);
   }
 
-  .nutrient-name { font-size: 11px; color: var(--gray-600); margin-bottom: 4px; }
-  .nutrient-val { font-size: 17px; font-weight: 700; }
-  .nutrient-unit { font-size: 10px; color: var(--gray-400); }
-  .nutrient-sub { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
+  .nutrient-name { font-size: 11px; color: var(--ink-muted); margin-bottom: 6px; letter-spacing: -0.1px; }
+  .nutrient-val { font-size: 18px; font-weight: 600; color: var(--ink); letter-spacing: -0.3px; }
+  .nutrient-unit { font-size: 10px; color: var(--ink-faint); }
+  .nutrient-sub { font-size: 10px; color: var(--ink-faint); margin-top: 3px; }
 
   /* Meal list */
   .section-header {
@@ -306,23 +357,22 @@
     margin-bottom: 12px;
   }
 
-  .section-title { font-size: 16px; font-weight: 700; }
+  .section-title { font-size: 17px; font-weight: 600; letter-spacing: -0.2px; color: var(--ink); }
 
-  .meal-list { display: flex; flex-direction: column; gap: 8px; }
+  .meal-list { display: flex; flex-direction: column; gap: 1px; background: var(--hairline-soft); border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--hairline-soft); }
 
   .meal-item {
     display: flex; align-items: center; gap: 12px;
-    padding: 12px;
-    background: var(--gray-100);
-    border-radius: 12px;
+    padding: 13px 16px;
+    background: var(--canvas);
   }
 
-  .meal-time { font-size: 11px; color: var(--gray-400); width: 36px; flex-shrink: 0; }
+  .meal-time { font-size: 11px; color: var(--ink-faint); width: 36px; flex-shrink: 0; }
 
   .meal-thumb {
-    width: 44px; height: 44px;
-    border-radius: 8px; object-fit: cover;
-    background: var(--gray-200);
+    width: 40px; height: 40px;
+    border-radius: var(--radius-sm); object-fit: cover;
+    background: var(--parchment);
     flex-shrink: 0;
   }
 
@@ -332,15 +382,15 @@
   }
 
   .meal-info { flex: 1; min-width: 0; }
-  .meal-name { font-size: 14px; font-weight: 600; }
-  .meal-meta { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+  .meal-name { font-size: 15px; font-weight: 500; color: var(--ink); }
+  .meal-meta { font-size: 12px; color: var(--ink-muted); margin-top: 1px; }
 
-  .meal-kcal { font-size: 14px; font-weight: 700; color: var(--gray-600); }
+  .meal-kcal { font-size: 14px; font-weight: 600; color: var(--ink-muted); }
 
   /* Empty state */
   .empty-state {
     text-align: center; padding: 32px 0;
-    color: var(--gray-400);
+    color: var(--ink-faint);
   }
 
   .empty-state .empty-icon { font-size: 40px; margin-bottom: 8px; }
@@ -380,13 +430,16 @@
     max-width: 80%;
     padding: 10px 14px;
     border-radius: 18px;
-    font-size: 14px; line-height: 1.5;
+    font-size: 15px; line-height: 1.47;
+    letter-spacing: -0.1px;
   }
 
   .msg.ai {
-    background: var(--gray-100);
+    background: var(--canvas);
+    border: 1px solid var(--hairline-soft);
     border-bottom-left-radius: 4px;
     align-self: flex-start;
+    color: var(--ink);
   }
 
   .msg.user {
@@ -396,46 +449,49 @@
   }
 
   .msg-time {
-    font-size: 10px; color: var(--gray-400);
+    font-size: 10px; color: var(--ink-faint);
     margin-top: 4px;
   }
 
   .msg-meal-card {
-    background: #fff;
-    border: 1px solid var(--gray-200);
-    border-radius: 12px;
+    background: var(--parchment);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-md);
     padding: 12px;
     margin-top: 8px;
   }
 
-  .msg-meal-name { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .msg-meal-name { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--ink); }
 
   .msg-nutrients { display: flex; gap: 12px; flex-wrap: wrap; }
 
-  .msg-nutrient { font-size: 12px; color: var(--gray-600); }
-  .msg-nutrient span { font-weight: 700; color: var(--gray-900); }
+  .msg-nutrient { font-size: 12px; color: var(--ink-muted); }
+  .msg-nutrient span { font-weight: 700; color: var(--ink); }
 
   .chat-input-area {
     padding: 8px 16px 12px;
-    border-top: 1px solid var(--gray-200);
-    background: #fff;
+    border-top: 1px solid var(--hairline-soft);
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
   }
   .chat-date-row {
     display: flex; align-items: center; gap: 6px;
     margin-bottom: 8px;
   }
   .chat-date-label {
-    font-size: 12px; color: var(--gray-500);
+    font-size: 12px; color: var(--ink-muted);
     white-space: nowrap;
   }
   .chat-date-input {
-    font-size: 12px; color: var(--gray-700);
-    border: 1px solid var(--gray-200);
-    border-radius: 8px;
-    padding: 3px 8px;
-    background: var(--gray-50);
+    font-size: 12px; color: var(--ink);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+    background: var(--canvas);
     outline: none;
     font-family: var(--font);
+    transition: border-color 0.2s;
   }
   .chat-date-input:focus { border-color: var(--green); }
 
@@ -445,19 +501,21 @@
 
   .chat-input-box {
     flex: 1;
-    padding: 10px 14px;
-    border: 1.5px solid var(--gray-200);
-    border-radius: 22px;
+    padding: 10px 16px;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-pill);
     font-size: 15px;
     font-family: var(--font);
     outline: none; resize: none;
     max-height: 100px;
     overflow-y: auto;
-    line-height: 1.4;
+    line-height: 1.47;
+    background: var(--canvas);
+    color: var(--ink);
     transition: border-color 0.2s;
   }
 
-  .chat-input-box:focus { border-color: var(--green); }
+  .chat-input-box:focus { border-color: var(--green); border-width: 1.5px; }
 
   .chat-btn {
     width: 40px; height: 40px;
@@ -470,24 +528,25 @@
 
   .chat-btn:hover { opacity: 0.8; }
 
-  .btn-photo { background: var(--gray-100); }
-  .btn-mic { background: var(--gray-100); transition: background 0.2s; }
+  .btn-photo { background: var(--parchment); }
+  .btn-mic { background: var(--parchment); transition: background 0.2s; }
   .btn-mic.recording { background: var(--red); color: #fff; animation: pulse 1s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
   .btn-send { background: var(--green); color: #fff; }
-  .btn-send:disabled { background: var(--gray-200); cursor: not-allowed; }
+  .btn-send:disabled { background: var(--hairline); cursor: not-allowed; }
 
   .typing-indicator {
     display: flex; gap: 4px; align-items: center;
     padding: 10px 14px;
-    background: var(--gray-100);
+    background: var(--canvas);
+    border: 1px solid var(--hairline-soft);
     border-radius: 18px; border-bottom-left-radius: 4px;
     align-self: flex-start;
   }
 
   .typing-dot {
     width: 6px; height: 6px;
-    background: var(--gray-400); border-radius: 50%;
+    background: var(--ink-faint); border-radius: 50%;
     animation: bounce 1.2s infinite;
   }
 
@@ -504,19 +563,22 @@
     display: flex; gap: 8px;
     padding: 8px 16px;
     overflow-x: auto;
-    border-bottom: 1px solid var(--gray-200);
+    border-bottom: 1px solid var(--hairline-soft);
+    scrollbar-width: none;
   }
+  .add-record-bar::-webkit-scrollbar { display: none; }
 
   .add-chip {
     display: flex; align-items: center; gap: 4px;
-    padding: 6px 12px;
-    border: 1.5px solid var(--gray-200);
-    border-radius: 20px;
-    font-size: 12px; font-weight: 600;
+    padding: 7px 14px;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-pill);
+    font-size: 13px; font-weight: 500;
     cursor: pointer; white-space: nowrap;
-    background: #fff;
+    background: var(--canvas);
+    color: var(--ink);
     font-family: var(--font);
-    transition: all 0.2s;
+    transition: all 0.15s;
   }
 
   .add-chip:hover { border-color: var(--green); color: var(--green); }
@@ -527,7 +589,7 @@
   }
 
   .weight-num { font-size: 56px; font-weight: 700; line-height: 1; }
-  .weight-unit { font-size: 20px; color: var(--gray-400); }
+  .weight-unit { font-size: 20px; color: var(--ink-faint); }
   .weight-change { font-size: 14px; margin-top: 8px; }
   .weight-change.down { color: var(--green); }
   .weight-change.up { color: var(--red); }
@@ -539,45 +601,52 @@
 
   .weight-input {
     flex: 1; padding: 12px 14px;
-    border: 1.5px solid var(--gray-200);
-    border-radius: 10px;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-md);
     font-size: 20px; font-weight: 700;
     font-family: var(--font);
     outline: none; text-align: center;
+    background: var(--canvas); color: var(--ink);
+    transition: border-color 0.2s;
   }
 
-  .weight-input:focus { border-color: var(--green); }
+  .weight-input:focus { border-color: var(--green); border-width: 1.5px; }
 
   .btn-record {
     padding: 12px 20px;
     background: var(--green); color: #fff;
-    border: none; border-radius: 10px;
-    font-size: 15px; font-weight: 600;
+    border: none; border-radius: var(--radius-pill);
+    font-size: 15px; font-weight: 500;
     cursor: pointer; font-family: var(--font);
+    transition: opacity 0.15s;
   }
+  .btn-record:active { opacity: 0.8; }
 
   /* Simple chart */
   .chart-wrap {
-    background: var(--gray-100);
-    border-radius: 16px;
+    background: var(--canvas);
+    border-radius: var(--radius-lg);
     padding: 16px;
     margin-bottom: 16px;
+    border: 1px solid var(--hairline-soft);
   }
 
-  .chart-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+  .chart-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--ink); }
 
   .chart-svg { width: 100%; height: 100px; overflow: visible; }
 
-  .weight-history { display: flex; flex-direction: column; gap: 8px; }
+  .weight-history { display: flex; flex-direction: column; gap: 0; background: var(--hairline-soft); border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--hairline-soft); }
 
   .weight-row {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--gray-200);
+    padding: 13px 16px;
+    background: var(--canvas);
+    border-bottom: 1px solid var(--hairline-soft);
   }
+  .weight-row:last-child { border-bottom: none; }
 
-  .weight-row-date { font-size: 13px; color: var(--gray-400); }
-  .weight-row-val { font-size: 16px; font-weight: 700; }
+  .weight-row-date { font-size: 13px; color: var(--ink-muted); }
+  .weight-row-val { font-size: 16px; font-weight: 700; color: var(--ink); }
 
   /* ===== WORKOUT PAGE ===== */
 
@@ -591,12 +660,12 @@
   .cat-tabs::-webkit-scrollbar { display: none; }
 
   .cat-tab {
-    padding: 6px 14px;
-    border: 1.5px solid var(--gray-200);
-    border-radius: 20px;
-    font-size: 13px; font-weight: 600;
+    padding: 6px 16px;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-pill);
+    font-size: 13px; font-weight: 500;
     white-space: nowrap; cursor: pointer;
-    background: #fff; color: var(--gray-600);
+    background: var(--canvas); color: var(--ink-muted);
     font-family: var(--font);
     transition: all 0.15s;
     flex-shrink: 0;
@@ -605,6 +674,7 @@
   .cat-tab.active {
     background: var(--green); color: #fff;
     border-color: var(--green);
+    font-weight: 600;
   }
 
   /* 種目チップ */
@@ -613,17 +683,18 @@
     margin-bottom: 14px; min-height: 36px;
   }
   .ex-chip {
-    padding: 5px 12px;
-    border: 1.5px solid var(--gray-200);
-    border-radius: 20px;
-    font-size: 12px; font-weight: 600;
-    cursor: pointer; background: #fff;
-    font-family: var(--font); color: var(--gray-900);
+    padding: 5px 14px;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-pill);
+    font-size: 12px; font-weight: 500;
+    cursor: pointer; background: var(--canvas);
+    font-family: var(--font); color: var(--ink);
     transition: all 0.15s;
   }
   .ex-chip:hover { border-color: var(--green); color: var(--green); }
   .ex-chip.selected {
-    background: #EAF6F1; border-color: var(--green); color: var(--green);
+    background: var(--green-light); border-color: var(--green); color: var(--green);
+    font-weight: 600;
   }
 
   /* 入力フォーム */
@@ -632,34 +703,35 @@
     gap: 8px; align-items: flex-end; margin-bottom: 16px;
   }
   .wk-input-group label {
-    display: block; font-size: 11px; color: var(--gray-600);
+    display: block; font-size: 11px; color: var(--ink-muted);
     margin-bottom: 4px; font-weight: 500;
   }
   .wk-input-group input {
     width: 100%; padding: 10px 8px;
-    border: 1.5px solid var(--gray-200); border-radius: 10px;
+    border: 1px solid var(--hairline); border-radius: var(--radius-md);
     font-size: 15px; font-weight: 700;
     font-family: var(--font); outline: none; text-align: center;
+    background: var(--canvas); color: var(--ink);
     transition: border-color 0.2s;
   }
-  .wk-input-group input:focus { border-color: var(--green); }
+  .wk-input-group input:focus { border-color: var(--green); border-width: 1.5px; }
 
   /* カレンダー/リスト切替 */
   .wk-view-toggle {
-    display: flex; background: var(--gray-100);
-    border-radius: 10px; padding: 3px; gap: 2px;
+    display: flex; background: var(--parchment);
+    border-radius: var(--radius-pill); padding: 3px; gap: 2px;
     margin-bottom: 16px;
   }
   .wk-view-btn {
     flex: 1; padding: 7px;
     border: none; background: transparent;
-    border-radius: 8px; font-size: 13px; font-weight: 600;
-    cursor: pointer; font-family: var(--font); color: var(--gray-600);
+    border-radius: var(--radius-pill); font-size: 13px; font-weight: 500;
+    cursor: pointer; font-family: var(--font); color: var(--ink-muted);
     transition: all 0.2s;
   }
   .wk-view-btn.active {
-    background: #fff; color: var(--gray-900);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    background: var(--canvas); color: var(--ink); font-weight: 600;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
   }
 
   /* カレンダー */
@@ -667,15 +739,15 @@
     display: flex; align-items: center; justify-content: space-between;
     margin-bottom: 12px;
   }
-  .cal-month-label { font-size: 16px; font-weight: 700; }
+  .cal-month-label { font-size: 16px; font-weight: 600; color: var(--ink); letter-spacing: -0.2px; }
   .cal-nav {
     width: 32px; height: 32px; border-radius: 50%;
-    border: 1.5px solid var(--gray-200); background: #fff;
+    border: 1px solid var(--hairline); background: var(--canvas);
     font-size: 16px; cursor: pointer; font-family: var(--font);
     display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s;
+    color: var(--ink); transition: all 0.15s;
   }
-  .cal-nav:hover { border-color: var(--green); }
+  .cal-nav:hover { border-color: var(--green); color: var(--green); }
 
   .cal-grid {
     display: grid; grid-template-columns: repeat(7, 1fr);
@@ -683,20 +755,20 @@
   }
   .cal-dow {
     text-align: center; font-size: 11px; font-weight: 600;
-    color: var(--gray-400); padding: 4px 0;
+    color: var(--ink-faint); padding: 4px 0;
   }
-  .cal-dow:first-child { color: #E24B4A; }
-  .cal-dow:last-child { color: #378ADD; }
+  .cal-dow:first-child { color: var(--red); }
+  .cal-dow:last-child { color: var(--blue); }
 
   .cal-day {
     aspect-ratio: 1; display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     border-radius: 50%; cursor: pointer;
     font-size: 14px; position: relative;
-    transition: background 0.15s;
+    transition: background 0.15s; color: var(--ink);
   }
-  .cal-day:hover { background: var(--gray-100); }
-  .cal-day.other-month { color: var(--gray-400); }
+  .cal-day:hover { background: var(--parchment); }
+  .cal-day.other-month { color: var(--ink-faint); }
   .cal-day.today {
     background: var(--blue); color: #fff; font-weight: 700;
   }
@@ -704,7 +776,7 @@
   .cal-day.has-workout {
     background: var(--green); color: #fff; font-weight: 700;
   }
-  .cal-day.has-workout:hover { background: #17875F; }
+  .cal-day.has-workout:hover { background: var(--green-dark); }
   .cal-day.today.has-workout { background: var(--green); }
   .cal-day.has-meal { background: var(--amber); color: #fff; font-weight: 700; }
   .cal-day.has-meal:hover { background: #9A6010; }
@@ -717,44 +789,47 @@
   .has-workout .cal-dot, .today .cal-dot { background: rgba(255,255,255,0.7); }
 
   /* 記録リスト */
-  .workout-log { display: flex; flex-direction: column; gap: 10px; }
+  .workout-log { display: flex; flex-direction: column; gap: 8px; }
   .workout-item {
-    background: var(--gray-100); border-radius: 12px; padding: 14px;
+    background: var(--canvas);
+    border: 1px solid var(--hairline-soft);
+    border-radius: var(--radius-md); padding: 14px;
   }
-  .workout-name { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+  .workout-name { font-size: 15px; font-weight: 600; margin-bottom: 8px; color: var(--ink); }
   .workout-sets { display: flex; flex-wrap: wrap; gap: 6px; }
   .set-chip {
-    padding: 4px 10px; background: #fff;
-    border: 1px solid var(--gray-200); border-radius: 20px; font-size: 12px;
+    padding: 4px 12px; background: var(--parchment);
+    border: 1px solid var(--hairline); border-radius: var(--radius-pill); font-size: 12px;
+    color: var(--ink-muted);
   }
 
   /* 日別詳細 */
   .day-detail-bar {
-    background: #EAF6F1; border-radius: 12px;
+    background: var(--green-light); border-radius: var(--radius-md);
     padding: 12px 14px; margin: 12px 0 4px;
-    font-size: 13px;
+    font-size: 13px; color: var(--ink);
   }
   .day-detail-bar strong { font-size: 14px; display: block; margin-bottom: 6px; color: var(--green); }
 
   /* ===== MODAL ===== */
   .modal-overlay {
     position: fixed; inset: 0;
-    background: rgba(0,0,0,0.4);
+    background: rgba(0,0,0,0.35);
     display: flex; align-items: flex-end;
     z-index: 200;
     opacity: 0; pointer-events: none;
-    transition: opacity 0.2s;
+    transition: opacity 0.25s;
   }
 
   .modal-overlay.open { opacity: 1; pointer-events: auto; }
 
   .modal-sheet {
     width: 100%;
-    background: #fff;
-    border-radius: 20px 20px 0 0;
-    padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+    background: var(--canvas);
+    border-radius: 22px 22px 0 0;
+    padding: 20px 20px calc(24px + env(safe-area-inset-bottom));
     transform: translateY(100%);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
     max-height: 85vh;
     overflow-y: auto;
   }
@@ -762,17 +837,21 @@
   .modal-overlay.open .modal-sheet { transform: translateY(0); }
 
   .modal-handle {
-    width: 40px; height: 4px;
-    background: var(--gray-200); border-radius: 2px;
+    width: 36px; height: 4px;
+    background: var(--hairline); border-radius: 2px;
     margin: 0 auto 20px;
   }
 
-  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+  .modal-title {
+    font-size: 17px; font-weight: 600;
+    margin-bottom: 20px; color: var(--ink);
+    letter-spacing: -0.2px;
+  }
 
   /* Photo preview */
   .photo-preview {
-    width: 100%; max-height: 200px;
-    object-fit: cover; border-radius: 12px;
+    width: 100%; max-height: 220px;
+    object-fit: cover; border-radius: var(--radius-lg);
     margin-bottom: 16px; display: none;
   }
 
@@ -781,11 +860,13 @@
     position: fixed;
     bottom: calc(80px + env(safe-area-inset-bottom));
     left: 50%; transform: translateX(-50%) translateY(20px);
-    background: var(--gray-900); color: #fff;
-    padding: 10px 18px; border-radius: 20px;
+    background: rgba(29,29,31,0.92); color: #fff;
+    padding: 10px 20px; border-radius: var(--radius-pill);
     font-size: 13px; white-space: nowrap;
     opacity: 0; transition: all 0.3s;
     pointer-events: none; z-index: 300;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
 
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -977,10 +1058,10 @@
 
     <!-- Nutrients -->
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <div style="font-size:13px;font-weight:600;color:var(--gray-600)" id="nutrientLabel">栄養素</div>
+      <div style="font-size:13px;font-weight:600;color:var(--ink-muted)" id="nutrientLabel">栄養素</div>
       <button id="nutrientCustomBtn" onclick="openNutrientPicker()"
         style="display:none;font-size:12px;color:var(--green);border:1px solid var(--green);
-        background:#fff;border-radius:20px;padding:3px 10px;cursor:pointer;font-family:var(--font);font-weight:600">
+        background:var(--canvas);border-radius:var(--radius-pill);padding:4px 12px;cursor:pointer;font-family:var(--font);font-weight:500">
         ⚙ カスタマイズ
       </button>
     </div>
@@ -1001,23 +1082,23 @@
     <div class="section-header" style="margin-top:24px">
       <div class="section-title">⚖️ 体重</div>
     </div>
-    <div style="background:var(--gray-100);border-radius:20px;padding:16px 20px;margin-bottom:8px">
+    <div style="background:var(--canvas);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:8px;border:1px solid var(--hairline-soft)">
       <div style="display:flex;align-items:flex-end;gap:8px;margin-bottom:12px">
-        <span style="font-size:42px;font-weight:700;line-height:1" id="currentWeight">—</span>
-        <span style="font-size:16px;color:var(--gray-400);margin-bottom:6px">kg</span>
+        <span style="font-size:42px;font-weight:700;line-height:1;color:var(--ink)" id="currentWeight">—</span>
+        <span style="font-size:16px;color:var(--ink-faint);margin-bottom:6px">kg</span>
         <span style="font-size:13px;margin-bottom:8px;margin-left:4px" id="weightChange"></span>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:14px">
         <input type="number" id="weightInput" placeholder="今日の体重" step="0.1" inputmode="decimal"
-          style="flex:1;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:10px;
-          font-size:16px;font-weight:700;font-family:var(--font);outline:none;transition:border-color 0.2s"
-          onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--gray-200)'">
+          style="flex:1;padding:10px 14px;border:1px solid var(--hairline);border-radius:var(--radius-md);
+          font-size:16px;font-weight:700;font-family:var(--font);outline:none;transition:border-color 0.2s;background:var(--parchment);color:var(--ink)"
+          onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--hairline)'">
         <button onclick="recordWeight()"
           style="padding:10px 18px;background:var(--green);color:#fff;border:none;
-          border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font)">記録</button>
+          border-radius:var(--radius-pill);font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font)">記録</button>
       </div>
       <div style="margin-bottom:6px">
-        <div style="font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:8px">推移</div>
+        <div style="font-size:12px;font-weight:600;color:var(--ink-muted);margin-bottom:8px">推移</div>
         <svg id="weightChart" viewBox="0 0 300 60" style="width:100%;height:60px;overflow:visible"></svg>
       </div>
     </div>
@@ -1061,7 +1142,7 @@
     <div class="ex-chips" id="exChips"></div>
 
     <!-- 選択中の種目表示 -->
-    <div id="exNameDisplay" style="font-size:13px;color:var(--gray-400);margin-bottom:10px;min-height:18px"></div>
+    <div id="exNameDisplay" style="font-size:13px;color:var(--ink-faint);margin-bottom:10px;min-height:18px"></div>
 
     <!-- 入力フォーム -->
     <div class="wk-inputs">
@@ -1101,14 +1182,14 @@
 
     <!-- 凡例 -->
     <div style="display:flex;gap:14px;margin:12px 0 16px;flex-wrap:wrap">
-      <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--gray-600)">
-        <div style="width:12px;height:12px;border-radius:50%;background:var(--green)"></div>筋トレあり
+      <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-muted)">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--green)"></div>筋トレあり
       </div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--gray-600)">
-        <div style="width:12px;height:12px;border-radius:50%;background:var(--amber)"></div>食事のみ
+      <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-muted)">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--amber)"></div>食事のみ
       </div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--gray-600)">
-        <div style="width:12px;height:12px;border-radius:50%;background:var(--blue)"></div>今日
+      <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-muted)">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--blue)"></div>今日
       </div>
     </div>
 
@@ -1164,7 +1245,7 @@
   <div class="modal-sheet" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
     <div class="modal-title">表示する栄養素を選ぶ</div>
-    <div style="font-size:13px;color:var(--gray-400);margin-bottom:16px">最大3つまで選べます</div>
+    <div style="font-size:13px;color:var(--ink-muted);margin-bottom:16px">最大3つまで選べます</div>
     <div id="nutrientPickerChips" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px"></div>
     <button class="btn-primary" onclick="saveNutrientPicker()">保存する</button>
   </div>
@@ -1176,11 +1257,11 @@
     <div class="modal-handle"></div>
     <div class="modal-title" id="mealMoveTitle">📅 日付を変更</div>
     <div style="margin-bottom:20px">
-      <label style="font-size:13px;color:var(--gray-600);display:block;margin-bottom:8px">移動先の日付</label>
-      <input type="date" id="mealMoveDateInput" style="width:100%;font-size:16px;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:12px;font-family:var(--font);outline:none;box-sizing:border-box">
+      <label style="font-size:12px;color:var(--ink-muted);display:block;margin-bottom:8px;font-weight:500">移動先の日付</label>
+      <input type="date" id="mealMoveDateInput" style="width:100%;font-size:16px;padding:11px 14px;border:1px solid var(--hairline);border-radius:var(--radius-md);font-family:var(--font);outline:none;box-sizing:border-box;background:var(--canvas);color:var(--ink)">
     </div>
     <button class="btn-primary" onclick="confirmMealMove()">移動する</button>
-    <button onclick="closeMealMoveModal()" style="width:100%;margin-top:10px;padding:12px;border:none;background:none;color:var(--gray-400);font-size:15px;cursor:pointer">キャンセル</button>
+    <button onclick="closeMealMoveModal()" style="width:100%;margin-top:10px;padding:12px;border:none;background:none;color:var(--ink-muted);font-size:15px;cursor:pointer;font-family:var(--font)">キャンセル</button>
   </div>
 </div>
 
@@ -1193,30 +1274,30 @@
     <input type="hidden" id="editMealDate">
     <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
       <div>
-        <label style="font-size:12px;color:var(--gray-500);margin-bottom:4px;display:block">食事名</label>
-        <input type="text" id="editMealName" style="width:100%;font-size:15px;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-family:var(--font);outline:none;box-sizing:border-box">
+        <label style="font-size:12px;color:var(--ink-muted);margin-bottom:6px;display:block;font-weight:500">食事名</label>
+        <input type="text" id="editMealName" style="width:100%;font-size:15px;padding:10px 14px;border:1px solid var(--hairline);border-radius:var(--radius-md);font-family:var(--font);outline:none;box-sizing:border-box;background:var(--canvas);color:var(--ink)">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div>
-          <label style="font-size:12px;color:var(--gray-500);margin-bottom:4px;display:block">🔥 カロリー(kcal)</label>
-          <input type="number" id="editMealCalories" style="width:100%;font-size:15px;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-family:var(--font);outline:none;box-sizing:border-box">
+          <label style="font-size:12px;color:var(--ink-muted);margin-bottom:6px;display:block;font-weight:500">🔥 カロリー(kcal)</label>
+          <input type="number" id="editMealCalories" style="width:100%;font-size:15px;padding:10px 14px;border:1px solid var(--hairline);border-radius:var(--radius-md);font-family:var(--font);outline:none;box-sizing:border-box;background:var(--canvas);color:var(--ink)">
         </div>
         <div>
-          <label style="font-size:12px;color:var(--gray-500);margin-bottom:4px;display:block">💪 タンパク質(g)</label>
-          <input type="number" id="editMealProtein" style="width:100%;font-size:15px;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-family:var(--font);outline:none;box-sizing:border-box">
+          <label style="font-size:12px;color:var(--ink-muted);margin-bottom:6px;display:block;font-weight:500">💪 タンパク質(g)</label>
+          <input type="number" id="editMealProtein" style="width:100%;font-size:15px;padding:10px 14px;border:1px solid var(--hairline);border-radius:var(--radius-md);font-family:var(--font);outline:none;box-sizing:border-box;background:var(--canvas);color:var(--ink)">
         </div>
         <div>
-          <label style="font-size:12px;color:var(--gray-500);margin-bottom:4px;display:block">🌾 炭水化物(g)</label>
-          <input type="number" id="editMealCarbs" style="width:100%;font-size:15px;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-family:var(--font);outline:none;box-sizing:border-box">
+          <label style="font-size:12px;color:var(--ink-muted);margin-bottom:6px;display:block;font-weight:500">🌾 炭水化物(g)</label>
+          <input type="number" id="editMealCarbs" style="width:100%;font-size:15px;padding:10px 14px;border:1px solid var(--hairline);border-radius:var(--radius-md);font-family:var(--font);outline:none;box-sizing:border-box;background:var(--canvas);color:var(--ink)">
         </div>
         <div>
-          <label style="font-size:12px;color:var(--gray-500);margin-bottom:4px;display:block">🥑 脂質(g)</label>
-          <input type="number" id="editMealFat" style="width:100%;font-size:15px;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-family:var(--font);outline:none;box-sizing:border-box">
+          <label style="font-size:12px;color:var(--ink-muted);margin-bottom:6px;display:block;font-weight:500">🥑 脂質(g)</label>
+          <input type="number" id="editMealFat" style="width:100%;font-size:15px;padding:10px 14px;border:1px solid var(--hairline);border-radius:var(--radius-md);font-family:var(--font);outline:none;box-sizing:border-box;background:var(--canvas);color:var(--ink)">
         </div>
       </div>
     </div>
     <button class="btn-primary" onclick="confirmMealEdit()">保存する</button>
-    <button onclick="closeMealEditModal()" style="width:100%;margin-top:10px;padding:12px;border:none;background:none;color:var(--gray-400);font-size:15px;cursor:pointer">キャンセル</button>
+    <button onclick="closeMealEditModal()" style="width:100%;margin-top:10px;padding:12px;border:none;background:none;color:var(--ink-muted);font-size:15px;cursor:pointer;font-family:var(--font)">キャンセル</button>
   </div>
 </div>
 
@@ -1241,8 +1322,8 @@ let state = {
 // ===== 栄養素定義 =====
 const NUTRIENT_DEFS = {
   protein:  { label: 'タンパク質', unit: 'g',  color: '--blue',    precision: 0, getTarget: () => getTargetProtein() },
-  carbs:    { label: '炭水化物',   unit: 'g',  color: '--gray-600', precision: 0, getTarget: null },
-  fat:      { label: '脂質',       unit: 'g',  color: '--gray-600', precision: 1, getTarget: null },
+  carbs:    { label: '炭水化物',   unit: 'g',  color: '--ink-muted', precision: 0, getTarget: null },
+  fat:      { label: '脂質',       unit: 'g',  color: '--ink-muted', precision: 1, getTarget: null },
   vitaminC: { label: 'ビタミンC',  unit: 'mg', color: '--amber',   precision: 0, getTarget: () => 100 },
   iron:     { label: '鉄分',       unit: 'mg', color: '--pink',    precision: 1, getTarget: () => state.user?.gender === 'female' ? 10.5 : 7.5 },
   zinc:     { label: '亜鉛',       unit: 'mg', color: '--green',   precision: 1, getTarget: () => state.user?.gender === 'female' ? 8 : 11 },
@@ -1268,10 +1349,10 @@ function renderPickerChips() {
   container.innerHTML = Object.entries(NUTRIENT_DEFS).map(([key, def]) => {
     const sel = pickerSelected.includes(key);
     return `<button onclick="togglePickerNutrient('${key}')" id="pchip-${key}"
-      style="padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;
-      font-family:var(--font);transition:all 0.15s;border:2px solid ${sel ? 'var(--green)' : 'var(--gray-200)'};
-      background:${sel ? '#EAF6F1' : '#fff'};color:${sel ? 'var(--green)' : 'var(--gray-900)'}">
-      ${def.label} <span style="font-size:11px;opacity:0.7">(${def.unit})</span>
+      style="padding:8px 16px;border-radius:9999px;font-size:13px;font-weight:${sel?'600':'500'};cursor:pointer;
+      font-family:var(--font);transition:all 0.15s;border:1.5px solid ${sel ? 'var(--green)' : 'var(--hairline)'};
+      background:${sel ? 'var(--green-light)' : 'var(--canvas)'};color:${sel ? 'var(--green)' : 'var(--ink)'}">
+      ${def.label} <span style="font-size:11px;opacity:0.6">(${def.unit})</span>
     </button>`;
   }).join('');
 }
@@ -1487,7 +1568,7 @@ function renderHome() {
       <div class="nutrient-val" style="color:var(${def.color})">${val.toFixed(def.precision)}</div>
       <div class="nutrient-unit">${def.unit}</div>
       ${tgt ? `<div class="nutrient-sub">目標 ${tgt}${def.unit}</div>
-        <div style="margin-top:4px;height:3px;background:var(--gray-200);border-radius:2px;overflow:hidden">
+        <div style="margin-top:4px;height:3px;background:var(--hairline);border-radius:2px;overflow:hidden">
           <div style="height:100%;width:${pct}%;background:var(${def.color});border-radius:2px;transition:width 0.6s"></div>
         </div>` : ''}
     </div>`;
@@ -1612,11 +1693,11 @@ function buildMealCardHTML(meal, cardId) {
     </div>
     <div style="display:flex;gap:8px;margin-top:10px">
       <button onclick="recordMealFromCard(${d})"
-        style="flex:1;padding:8px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">
+        style="flex:1;padding:8px 12px;background:var(--green);color:#fff;border:none;border-radius:9999px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font)">
         ✅ 記録する
       </button>
       <button onclick="editMealCard('${cardId}', ${d})"
-        style="padding:8px 12px;background:var(--gray-100);border:1px solid var(--gray-200);border-radius:8px;font-size:13px;cursor:pointer;font-family:var(--font)">
+        style="padding:8px 14px;background:var(--parchment);border:1px solid var(--hairline);border-radius:9999px;font-size:13px;cursor:pointer;font-family:var(--font);color:var(--ink)">
         ✏️ 編集
       </button>
     </div>`;
@@ -1626,34 +1707,34 @@ function editMealCard(cardId, meal) {
   const card = document.getElementById(cardId);
   if (!card) return;
   card.innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:8px">
+    <div style="display:flex;flex-direction:column;gap:10px">
       <input id="edit_name_${cardId}" value="${meal.name}" placeholder="食品名"
-        style="padding:6px 10px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:var(--font)">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-        <label style="font-size:12px;color:var(--gray-500)">🔥 カロリー(kcal)
+        style="padding:9px 12px;border:1px solid var(--hairline);border-radius:var(--radius-md);font-size:14px;font-family:var(--font);background:var(--canvas);color:var(--ink);outline:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <label style="font-size:12px;color:var(--ink-muted);font-weight:500">🔥 カロリー(kcal)
           <input id="edit_cal_${cardId}" type="number" value="${meal.calories}"
-            style="width:100%;margin-top:2px;padding:5px 8px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:var(--font)">
+            style="width:100%;margin-top:4px;padding:7px 10px;border:1px solid var(--hairline);border-radius:var(--radius-sm);font-size:13px;font-family:var(--font);background:var(--canvas);color:var(--ink);outline:none">
         </label>
-        <label style="font-size:12px;color:var(--gray-500)">💪 タンパク質(g)
+        <label style="font-size:12px;color:var(--ink-muted);font-weight:500">💪 タンパク質(g)
           <input id="edit_p_${cardId}" type="number" value="${meal.protein}"
-            style="width:100%;margin-top:2px;padding:5px 8px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:var(--font)">
+            style="width:100%;margin-top:4px;padding:7px 10px;border:1px solid var(--hairline);border-radius:var(--radius-sm);font-size:13px;font-family:var(--font);background:var(--canvas);color:var(--ink);outline:none">
         </label>
-        <label style="font-size:12px;color:var(--gray-500)">🌾 炭水化物(g)
+        <label style="font-size:12px;color:var(--ink-muted);font-weight:500">🌾 炭水化物(g)
           <input id="edit_c_${cardId}" type="number" value="${meal.carbs}"
-            style="width:100%;margin-top:2px;padding:5px 8px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:var(--font)">
+            style="width:100%;margin-top:4px;padding:7px 10px;border:1px solid var(--hairline);border-radius:var(--radius-sm);font-size:13px;font-family:var(--font);background:var(--canvas);color:var(--ink);outline:none">
         </label>
-        <label style="font-size:12px;color:var(--gray-500)">🥑 脂質(g)
+        <label style="font-size:12px;color:var(--ink-muted);font-weight:500">🥑 脂質(g)
           <input id="edit_f_${cardId}" type="number" value="${meal.fat}"
-            style="width:100%;margin-top:2px;padding:5px 8px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:var(--font)">
+            style="width:100%;margin-top:4px;padding:7px 10px;border:1px solid var(--hairline);border-radius:var(--radius-sm);font-size:13px;font-family:var(--font);background:var(--canvas);color:var(--ink);outline:none">
         </label>
       </div>
-      <div style="display:flex;gap:8px;margin-top:4px">
+      <div style="display:flex;gap:8px;margin-top:2px">
         <button onclick="saveMealCardEdit('${cardId}', ${JSON.stringify(meal).replace(/"/g, '&quot;')})"
-          style="flex:1;padding:8px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">
+          style="flex:1;padding:9px;background:var(--green);color:#fff;border:none;border-radius:9999px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font)">
           ✅ 保存して記録
         </button>
         <button onclick="cancelMealCardEdit('${cardId}', ${JSON.stringify(meal).replace(/"/g, '&quot;')})"
-          style="padding:8px 12px;background:var(--gray-100);border:1px solid var(--gray-200);border-radius:8px;font-size:13px;cursor:pointer;font-family:var(--font)">
+          style="padding:9px 14px;background:var(--parchment);border:1px solid var(--hairline);border-radius:9999px;font-size:13px;cursor:pointer;font-family:var(--font);color:var(--ink-muted)">
           キャンセル
         </button>
       </div>
@@ -2503,7 +2584,7 @@ function showUnifiedDayDetail(dateStr) {
 
   if (!dayMeals.length && !dayWorkouts.length && !dayWeight) {
     document.getElementById('calDayDetail').innerHTML =
-      `<div style="text-align:center;padding:24px;color:var(--gray-400);font-size:14px">
+      `<div style="text-align:center;padding:24px;color:var(--ink-faint);font-size:14px">
         ${label}の記録はありません
       </div>`;
     return;
@@ -2515,31 +2596,29 @@ function showUnifiedDayDetail(dateStr) {
   const totalVitC     = dayMeals.reduce((s, m) => s + (m.vitaminC || 0), 0);
   const totalIron     = dayMeals.reduce((s, m) => s + (m.iron || 0), 0);
 
-  let html = `<div style="border:1.5px solid var(--gray-200);border-radius:16px;overflow:hidden;margin-top:4px">
-    <div style="background:var(--green);color:#fff;padding:12px 16px;font-weight:700;font-size:15px">
+  let html = `<div style="border:1px solid var(--hairline-soft);border-radius:var(--radius-lg);overflow:hidden;margin-top:4px">
+    <div style="background:var(--green);color:#fff;padding:12px 16px;font-weight:600;font-size:15px;letter-spacing:-0.2px">
       📅 ${label}
     </div>`;
 
   // 食事セクション
   if (dayMeals.length) {
-    const grouped = {};
-    dayMeals.forEach(m => { if (!grouped[m.time||'—']) grouped[m.time||'—'] = []; grouped[m.time||'—'].push(m); });
-    html += `<div style="padding:14px 16px;border-bottom:1px solid var(--gray-200)">
-      <div style="font-size:13px;font-weight:700;color:var(--gray-600);margin-bottom:8px">
-        🍽️ 食事 <span style="float:right;color:var(--gray-900)">${totalMealKcal} kcal</span>
+    html += `<div style="padding:14px 16px;border-bottom:1px solid var(--hairline-soft);background:var(--canvas)">
+      <div style="font-size:13px;font-weight:600;color:var(--ink-muted);margin-bottom:8px">
+        🍽️ 食事 <span style="float:right;color:var(--ink);font-weight:700">${totalMealKcal} kcal</span>
       </div>
       ${dayMeals.map(m => `
-        <div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid var(--gray-100)">
+        <div style="display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid var(--hairline-soft)">
           <span style="font-size:18px">${m.emoji||'🍽️'}</span>
-          <span style="font-size:14px;flex:1">${m.name}</span>
-          <span style="font-size:12px;color:var(--gray-400)">${m.calories||0}kcal</span>
-          <button onclick="openEditMealModal(${m.id},'${dateStr}')" style="font-size:12px;padding:3px 8px;border:1px solid var(--gray-300);border-radius:8px;background:#fff;color:var(--gray-600);cursor:pointer">✏️</button>
-          <button onclick="openMoveMealModal(${m.id},'${dateStr}')" style="font-size:12px;padding:3px 8px;border:1px solid var(--gray-300);border-radius:8px;background:#fff;color:var(--gray-600);cursor:pointer">📅</button>
-          <button onclick="deleteMeal(${m.id},'${dateStr}')" style="font-size:12px;padding:3px 8px;border:1px solid #fcc;border-radius:8px;background:#fff;color:var(--red);cursor:pointer">🗑️</button>
+          <span style="font-size:14px;flex:1;color:var(--ink)">${m.name}</span>
+          <span style="font-size:12px;color:var(--ink-muted)">${m.calories||0}kcal</span>
+          <button onclick="openEditMealModal(${m.id},'${dateStr}')" style="font-size:11px;padding:4px 8px;border:1px solid var(--hairline);border-radius:9999px;background:var(--canvas);color:var(--ink-muted);cursor:pointer;font-family:var(--font)">✏️</button>
+          <button onclick="openMoveMealModal(${m.id},'${dateStr}')" style="font-size:11px;padding:4px 8px;border:1px solid var(--hairline);border-radius:9999px;background:var(--canvas);color:var(--ink-muted);cursor:pointer;font-family:var(--font)">📅</button>
+          <button onclick="deleteMeal(${m.id},'${dateStr}')" style="font-size:11px;padding:4px 8px;border:1px solid rgba(226,75,74,0.3);border-radius:9999px;background:var(--canvas);color:var(--red);cursor:pointer;font-family:var(--font)">🗑️</button>
         </div>`).join('')}
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <button onclick="openBulkMoveModal('${dateStr}')" style="flex:1;font-size:12px;padding:7px;border:1px solid var(--gray-300);border-radius:10px;background:#fff;color:var(--gray-700);cursor:pointer">📅 まとめて移動</button>
-        <button onclick="deleteDayMeals('${dateStr}')" style="flex:1;font-size:12px;padding:7px;border:1px solid #fcc;border-radius:10px;background:#fff;color:var(--red);cursor:pointer">🗑️ まとめて削除</button>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button onclick="openBulkMoveModal('${dateStr}')" style="flex:1;font-size:12px;padding:8px;border:1px solid var(--hairline);border-radius:9999px;background:var(--canvas);color:var(--ink-muted);cursor:pointer;font-family:var(--font)">📅 まとめて移動</button>
+        <button onclick="deleteDayMeals('${dateStr}')" style="flex:1;font-size:12px;padding:8px;border:1px solid rgba(226,75,74,0.3);border-radius:9999px;background:var(--canvas);color:var(--red);cursor:pointer;font-family:var(--font)">🗑️ まとめて削除</button>
       </div>
     </div>`;
   }
@@ -2548,14 +2627,14 @@ function showUnifiedDayDetail(dateStr) {
   if (dayWorkouts.length) {
     const grouped = {};
     dayWorkouts.forEach(w => { if (!grouped[w.name]) grouped[w.name] = []; grouped[w.name].push(w); });
-    html += `<div style="padding:14px 16px;border-bottom:1px solid var(--gray-200)">
-      <div style="font-size:13px;font-weight:700;color:var(--gray-600);margin-bottom:8px">
-        💪 筋トレ <span style="float:right;color:var(--gray-900)">消費 約${totalWkKcal} kcal</span>
+    html += `<div style="padding:14px 16px;border-bottom:1px solid var(--hairline-soft);background:var(--canvas)">
+      <div style="font-size:13px;font-weight:600;color:var(--ink-muted);margin-bottom:8px">
+        💪 筋トレ <span style="float:right;color:var(--ink);font-weight:700">消費 約${totalWkKcal} kcal</span>
       </div>
       ${Object.entries(grouped).map(([name, sets]) => `
-        <div style="padding:3px 0;font-size:13px">
+        <div style="padding:4px 0;font-size:13px;color:var(--ink)">
           <b>${name}</b>
-          <span style="color:var(--gray-400);margin-left:6px">
+          <span style="color:var(--ink-muted);margin-left:6px">
             ${sets.map(s => `${s.weight}kg×${s.reps}×${s.sets}set`).join(' / ')}
           </span>
         </div>`).join('')}
@@ -2564,17 +2643,17 @@ function showUnifiedDayDetail(dateStr) {
 
   // 体重セクション
   if (dayWeight) {
-    html += `<div style="padding:14px 16px;border-bottom:1px solid var(--gray-200)">
-      <div style="font-size:13px;font-weight:700;color:var(--gray-600);margin-bottom:4px">⚖️ 体重</div>
-      <div style="font-size:22px;font-weight:700">${dayWeight.kg.toFixed(1)} <span style="font-size:14px;color:var(--gray-400)">kg</span></div>
+    html += `<div style="padding:14px 16px;border-bottom:1px solid var(--hairline-soft);background:var(--canvas)">
+      <div style="font-size:13px;font-weight:600;color:var(--ink-muted);margin-bottom:4px">⚖️ 体重</div>
+      <div style="font-size:22px;font-weight:700;color:var(--ink)">${dayWeight.kg.toFixed(1)} <span style="font-size:14px;color:var(--ink-faint)">kg</span></div>
     </div>`;
   }
 
   // 栄養サマリー
   if (dayMeals.length) {
-    html += `<div style="padding:12px 16px;background:var(--gray-100)">
-      <div style="font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:6px">🌿 栄養サマリー</div>
-      <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px">
+    html += `<div style="padding:12px 16px;background:var(--green-light)">
+      <div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:6px">🌿 栄養サマリー</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink-muted)">
         <span>タンパク質 <b style="color:var(--blue)">${totalProtein.toFixed(0)}g</b></span>
         <span>ビタミンC <b style="color:var(--amber)">${totalVitC.toFixed(0)}mg</b></span>
         <span>鉄分 <b style="color:var(--pink)">${totalIron.toFixed(1)}mg</b></span>
