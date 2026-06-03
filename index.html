@@ -19,9 +19,9 @@
 
     /* Apple風サーフェス */
     --canvas: #ffffff;
-    --parchment: #f5f5f7;
-    --hairline: #e0e0e0;
-    --hairline-soft: rgba(0,0,0,0.06);
+    --parchment: #f2f2f7;
+    --hairline: #d1d1d6;
+    --hairline-soft: rgba(0,0,0,0.05);
 
     /* テキスト */
     --ink: #1d1d1f;
@@ -193,19 +193,19 @@
   /* Header */
   .header {
     position: sticky; top: 0;
-    background: rgba(255,255,255,0.88);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-bottom: 1px solid var(--hairline-soft);
+    background: rgba(242,242,247,0.92);
+    backdrop-filter: saturate(180%) blur(24px);
+    -webkit-backdrop-filter: saturate(180%) blur(24px);
+    border-bottom: 1px solid rgba(0,0,0,0.08);
     padding: 0 20px;
-    height: 52px;
+    height: 54px;
     display: flex; align-items: center; justify-content: space-between;
     z-index: 50;
   }
 
   .header-logo {
-    font-size: 18px; font-weight: 600;
-    letter-spacing: -0.374px;
+    font-size: 17px; font-weight: 700;
+    letter-spacing: -0.5px;
     color: var(--ink);
   }
   .header-logo span { color: var(--green); }
@@ -239,30 +239,29 @@
   /* Bottom nav */
   .bottom-nav {
     position: fixed; bottom: 0; left: 0; right: 0;
-    background: rgba(255,255,255,0.88);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-top: 1px solid var(--hairline-soft);
+    background: rgba(242,242,247,0.94);
+    backdrop-filter: saturate(200%) blur(28px);
+    -webkit-backdrop-filter: saturate(200%) blur(28px);
+    border-top: 0.5px solid rgba(0,0,0,0.12);
     display: grid; grid-template-columns: repeat(4, 1fr);
-    padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+    padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
     z-index: 50;
   }
 
   .nav-item {
     display: flex; flex-direction: column;
-    align-items: center; gap: 2px;
-    cursor: pointer;
-    padding: 4px 8px;
+    align-items: center; gap: 3px;
+    cursor: pointer; padding: 4px 4px;
     border: none; background: transparent;
     font-family: var(--font);
-    transition: opacity 0.15s;
+    transition: transform 0.15s;
   }
 
-  .nav-item:active { opacity: 0.6; }
-  .nav-item .nav-icon { font-size: 22px; line-height: 1; }
-  .nav-item .nav-label { font-size: 10px; color: var(--ink-faint); font-weight: 500; letter-spacing: -0.1px; }
-  .nav-item.active .nav-label { color: var(--green); font-weight: 600; }
+  .nav-item:active { transform: scale(0.88); }
+  .nav-item .nav-icon { font-size: 24px; line-height: 1; filter: grayscale(1) opacity(0.4); transition: filter 0.2s; }
+  .nav-item .nav-label { font-size: 10px; color: var(--ink-faint); font-weight: 500; letter-spacing: -0.2px; }
   .nav-item.active .nav-icon { filter: none; }
+  .nav-item.active .nav-label { color: var(--green); font-weight: 600; }
 
   /* Pages */
   .page { display: none; padding: 20px 16px 120px; background: var(--parchment); min-height: 100vh; }
@@ -275,43 +274,50 @@
   }
 
   .page-title {
-    font-size: clamp(22px, 5.5vw, 28px); font-weight: 700;
-    letter-spacing: -0.5px;
+    font-size: clamp(24px, 6vw, 32px); font-weight: 800;
+    letter-spacing: -0.8px;
     margin-bottom: 20px;
     color: var(--ink);
-    line-height: 1.25;
+    line-height: 1.15;
   }
 
-  /* Calorie ring — centrepiece card */
+  /* ===== CALORIE CARD — Apple Fitness style ===== */
   .calorie-card {
     background: var(--canvas);
-    border-radius: 24px;
-    padding: 24px 24px 20px;
+    border-radius: 26px;
+    padding: 24px 20px 20px;
     margin-bottom: 16px;
-    box-shadow: 0 2px 20px rgba(0,0,0,0.07);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
   }
 
-  /* Ring sits centred on top, stats below */
   .calorie-card-top {
-    display: flex; align-items: center; gap: 20px;
-    margin-bottom: 16px;
+    display: flex; flex-direction: column; align-items: center;
+    margin-bottom: 20px;
   }
 
-  .ring-wrap { position: relative; width: 110px; height: 110px; flex-shrink: 0; }
+  /* Big centered ring */
+  .ring-wrap {
+    position: relative; width: 140px; height: 140px;
+    flex-shrink: 0; margin-bottom: 6px;
+  }
 
-  .ring-svg { width: 110px; height: 110px; transform: rotate(-90deg); }
+  .ring-svg { width: 140px; height: 140px; transform: rotate(-90deg); }
 
-  .ring-bg { fill: none; stroke: var(--parchment); stroke-width: 10; }
+  .ring-bg { fill: none; stroke: var(--parchment); stroke-width: 12; }
 
   .ring-fill {
     fill: none; stroke: var(--green);
-    stroke-width: 10; stroke-linecap: round;
-    stroke-dasharray: 283;
-    stroke-dashoffset: 283;
-    transition: stroke-dashoffset 0.9s cubic-bezier(0.4,0,0.2,1);
+    stroke-width: 12; stroke-linecap: round;
+    stroke-dasharray: 339;
+    stroke-dashoffset: 339;
+    transition: stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1);
+    filter: drop-shadow(0 0 6px rgba(29,158,117,0.4));
   }
 
-  .ring-fill.over { stroke: var(--red); }
+  .ring-fill.over {
+    stroke: var(--red);
+    filter: drop-shadow(0 0 6px rgba(226,75,74,0.4));
+  }
 
   .ring-center {
     position: absolute; inset: 0;
@@ -319,31 +325,57 @@
     align-items: center; justify-content: center;
   }
 
-  .ring-num { font-size: 26px; font-weight: 700; line-height: 1; letter-spacing: -1px; }
-  .ring-unit { font-size: 10px; color: var(--ink-faint); margin-top: 1px; }
+  .ring-num {
+    font-size: 36px; font-weight: 700;
+    line-height: 1; letter-spacing: -1.5px;
+    color: var(--ink);
+  }
 
-  /* Right stats */
-  .calorie-stats { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  .ring-unit { font-size: 11px; color: var(--ink-faint); margin-top: 2px; letter-spacing: 0.2px; }
 
-  .calorie-stat-item { display: flex; flex-direction: column; gap: 1px; }
-  .calorie-stat-label { font-size: 11px; color: var(--ink-faint); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
-  .calorie-stat-val { font-size: 22px; font-weight: 700; color: var(--ink); letter-spacing: -0.5px; line-height: 1.1; }
-  .calorie-stat-unit { font-size: 11px; color: var(--ink-muted); }
+  /* Three-column stats below ring */
+  .calorie-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    width: 100%; gap: 0;
+    border-top: 1px solid var(--hairline-soft);
+    padding-top: 16px;
+  }
 
-  /* Bottom bar */
+  .calorie-stat-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 0 8px;
+  }
+  .calorie-stat-item:not(:last-child) {
+    border-right: 1px solid var(--hairline-soft);
+  }
+
+  .calorie-stat-label {
+    font-size: 11px; color: var(--ink-faint);
+    font-weight: 500; letter-spacing: 0.3px;
+  }
+
+  .calorie-stat-val {
+    font-size: 20px; font-weight: 700;
+    color: var(--ink); letter-spacing: -0.8px; line-height: 1.1;
+  }
+
+  .calorie-stat-unit { font-size: 10px; color: var(--ink-faint); }
+
+  /* Progress bar */
   .calorie-bar-wrap {
-    height: 5px; background: var(--parchment);
-    border-radius: 3px; overflow: hidden;
+    height: 4px; background: var(--parchment);
+    border-radius: 2px; overflow: hidden;
+    margin-top: 14px;
   }
 
   .calorie-bar {
-    height: 100%; background: var(--green);
-    border-radius: 3px;
-    transition: width 0.7s cubic-bezier(0.4,0,0.2,1);
+    height: 100%; background: linear-gradient(90deg, var(--green), #34d399);
+    border-radius: 2px;
+    transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
   }
 
-  /* Keep old selectors working */
-  .calorie-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+  /* Keep legacy selectors alive */
+  .calorie-row { display: none; }
   .calorie-label { font-size: 12px; color: var(--ink-muted); }
   .calorie-val { font-size: 14px; font-weight: 600; }
   .calorie-detail { flex: 1; }
@@ -356,20 +388,25 @@
 
   .nutrient-card {
     background: var(--canvas);
-    border-radius: 20px;
-    padding: 16px 10px 14px;
+    border-radius: 22px;
+    padding: 16px 8px 14px;
     text-align: center;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
+    position: relative; overflow: hidden;
   }
 
   .nutrient-name {
     font-size: 10px; color: var(--ink-faint);
-    margin-bottom: 8px; letter-spacing: 0.3px;
-    text-transform: uppercase; font-weight: 600;
+    margin-bottom: 10px; letter-spacing: 0.5px;
+    font-weight: 600; text-transform: uppercase;
   }
-  .nutrient-val { font-size: 26px; font-weight: 700; letter-spacing: -0.8px; line-height: 1; }
-  .nutrient-unit { font-size: 10px; color: var(--ink-faint); margin-top: 2px; }
-  .nutrient-sub { font-size: 10px; color: var(--ink-faint); margin-top: 4px; }
+  .nutrient-val {
+    font-size: 32px; font-weight: 700;
+    letter-spacing: -1.5px; line-height: 1;
+    display: block;
+  }
+  .nutrient-unit { font-size: 11px; color: var(--ink-faint); margin-top: 3px; display: block; }
+  .nutrient-sub { font-size: 10px; color: var(--ink-faint); margin-top: 5px; display: block; }
 
   /* Meal list */
   .section-header {
@@ -378,8 +415,9 @@
   }
 
   .section-title {
-    font-size: 15px; font-weight: 700;
-    letter-spacing: -0.2px; color: var(--ink);
+    font-size: 13px; font-weight: 600;
+    letter-spacing: 0.2px; color: var(--ink-muted);
+    text-transform: uppercase;
   }
 
   .meal-list {
@@ -1065,9 +1103,9 @@
     <div class="calorie-card">
       <div class="calorie-card-top">
         <div class="ring-wrap">
-          <svg class="ring-svg" viewBox="0 0 110 110">
-            <circle class="ring-bg" cx="55" cy="55" r="45"/>
-            <circle class="ring-fill" id="calRing" cx="55" cy="55" r="45"/>
+          <svg class="ring-svg" viewBox="0 0 140 140">
+            <circle class="ring-bg" cx="70" cy="70" r="54"/>
+            <circle class="ring-fill" id="calRing" cx="70" cy="70" r="54"/>
           </svg>
           <div class="ring-center">
             <div class="ring-num" id="ringNum">0</div>
@@ -1077,15 +1115,18 @@
         <div class="calorie-stats">
           <div class="calorie-stat-item">
             <span class="calorie-stat-label">摂取</span>
-            <span class="calorie-stat-val" id="calConsumed">0<span class="calorie-stat-unit"> kcal</span></span>
+            <span class="calorie-stat-val" id="calConsumed">0</span>
+            <span class="calorie-stat-unit">kcal</span>
           </div>
           <div class="calorie-stat-item">
             <span class="calorie-stat-label">残り</span>
             <span class="calorie-stat-val" id="calRemain">—</span>
+            <span class="calorie-stat-unit">kcal</span>
           </div>
           <div class="calorie-stat-item">
             <span class="calorie-stat-label">目標</span>
-            <span style="font-size:14px;color:var(--ink-muted);font-weight:500" id="calTarget">—</span>
+            <span class="calorie-stat-val" id="calTarget" style="font-size:16px">—</span>
+            <span class="calorie-stat-unit">kcal</span>
           </div>
         </div>
       </div>
@@ -1567,16 +1608,16 @@ function renderHome() {
 
   const target = getTargetCalories();
   const pct = Math.min(totalCal / target, 1);
-  const circumference = 2 * Math.PI * 45; // r=45 → ~283
+  const circumference = 2 * Math.PI * 54; // r=54 → ~339
   const offset = circumference * (1 - pct);
 
   document.getElementById('ringNum').textContent = totalCal;
-  document.getElementById('calTarget').textContent = target + ' kcal';
-  document.getElementById('calConsumed').innerHTML = totalCal + '<span class="calorie-stat-unit"> kcal</span>';
+  document.getElementById('calTarget').textContent = target;
+  document.getElementById('calConsumed').textContent = totalCal;
   const remain = target - totalCal;
-  document.getElementById('calRemain').innerHTML = remain >= 0
-    ? remain + '<span class="calorie-stat-unit"> kcal</span>'
-    : '<span style="color:var(--red)">超過 ' + Math.abs(remain) + '</span><span class="calorie-stat-unit"> kcal</span>';
+  const remainEl = document.getElementById('calRemain');
+  remainEl.textContent = remain >= 0 ? remain : '超過' + Math.abs(remain);
+  remainEl.style.color = remain < 0 ? 'var(--red)' : '';
 
   const ring = document.getElementById('calRing');
   ring.style.strokeDashoffset = offset;
