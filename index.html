@@ -794,7 +794,16 @@
   /* 種目チップ */
   .ex-chips {
     display: flex; flex-wrap: wrap; gap: 7px;
-    margin-bottom: 14px; min-height: 36px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    margin-bottom: 0;
+    transition: max-height 0.3s ease, opacity 0.22s ease, margin-bottom 0.3s ease;
+  }
+  .ex-chips.visible {
+    max-height: 500px;
+    opacity: 1;
+    margin-bottom: 14px;
   }
   .ex-chip {
     padding: 5px 14px;
@@ -2720,6 +2729,7 @@ const EXERCISE_DB = {
 
 let selectedCategory = '胸';
 let selectedExercise = null;
+let exChipsVisible = false;
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth(); // 0-indexed
 let wkCalYear  = new Date().getFullYear();
@@ -2744,19 +2754,32 @@ function getExerciseFactor(name) {
 function renderCategoryTabs() {
   const cats = ['ALL', ...Object.keys(EXERCISE_DB)];
   document.getElementById('catTabs').innerHTML = cats.map(c =>
-    `<button class="cat-tab ${c === selectedCategory ? 'active' : ''}" onclick="selectCategory('${c}')">${c}</button>`
+    `<button class="cat-tab ${c === selectedCategory && exChipsVisible ? 'active' : ''}" onclick="selectCategory('${c}')">${c}</button>`
   ).join('');
   renderExChips();
 }
 
 function selectCategory(cat) {
+  const chips = document.getElementById('exChips');
+
+  // 同じカテゴリーを再タップ → 折りたたむ
+  if (selectedCategory === cat && exChipsVisible) {
+    exChipsVisible = false;
+    chips.classList.remove('visible');
+    document.querySelectorAll('.cat-tab').forEach(el => el.classList.remove('active'));
+    return;
+  }
+
+  // 別カテゴリーまたは閉じている状態でタップ → 展開
   selectedCategory = cat;
+  exChipsVisible = true;
   selectedExercise = null;
   document.getElementById('exNameDisplay').textContent = '';
   document.querySelectorAll('.cat-tab').forEach(el => {
     el.classList.toggle('active', el.textContent === cat);
   });
   renderExChips();
+  chips.classList.add('visible');
 }
 
 function renderExChips() {
