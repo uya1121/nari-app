@@ -794,6 +794,33 @@
   }
   .wk-input-group input:focus { border-color: var(--green); border-width: 1.5px; }
 
+  /* 記録日ピッカー */
+  .wk-date-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 20px;
+    padding: 11px 16px;
+    background: var(--canvas);
+    border-radius: var(--radius-md);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  }
+
+  /* 筋トレミニカレンダー */
+  .wk-cal-section {
+    background: var(--canvas);
+    border-radius: 20px;
+    padding: 16px 16px 20px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    margin-bottom: 16px;
+  }
+
+  /* 筋トレカレンダー選択日 */
+  .cal-day.wk-selected {
+    background: var(--ink);
+    color: #fff; font-weight: 700;
+  }
+  .cal-day.wk-selected:hover { background: var(--ink); }
+  .cal-day.wk-selected.has-workout { background: var(--green-dark); }
+
   /* カレンダー/リスト切替 */
   .wk-view-toggle {
     display: flex; background: var(--parchment);
@@ -1235,6 +1262,12 @@
   <div class="page" id="page-workout">
     <div class="page-title">筋トレログ</div>
 
+    <!-- 記録日ピッカー -->
+    <div class="wk-date-row">
+      <span class="chat-date-label">📅 記録日：</span>
+      <input type="date" id="wkDatePicker" class="chat-date-input" onchange="onWkDateChange()">
+    </div>
+
     <!-- カテゴリータブ -->
     <div class="cat-tabs" id="catTabs"></div>
 
@@ -1261,12 +1294,25 @@
       <button class="btn-record" onclick="addWorkout()" style="padding:10px 14px;height:42px;align-self:flex-end">追加</button>
     </div>
 
-    <div class="section-title" style="margin-bottom:12px">今日のトレーニング</div>
+    <div id="wkLogTitle" class="section-title" style="margin-bottom:12px">今日のトレーニング</div>
     <div class="workout-log" id="workoutLog">
       <div class="empty-state">
         <div class="empty-icon">🏋️</div>
         <p>まだ記録がありません</p>
       </div>
+    </div>
+
+    <!-- 月別カレンダー -->
+    <div class="section-header" style="margin-top:32px">
+      <div class="section-title">月別記録</div>
+    </div>
+    <div class="wk-cal-section">
+      <div class="cal-header" style="margin-bottom:14px">
+        <button class="cal-nav" onclick="wkCalMove(-1)">‹</button>
+        <div class="cal-month-label" id="wkCalMonthLabel"></div>
+        <button class="cal-nav" onclick="wkCalMove(1)">›</button>
+      </div>
+      <div class="cal-grid" id="wkCalGrid"></div>
     </div>
   </div>
 
@@ -2508,6 +2554,8 @@ let selectedCategory = '胸';
 let selectedExercise = null;
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth(); // 0-indexed
+let wkCalYear  = new Date().getFullYear();
+let wkCalMonth = new Date().getMonth();
 let wkView = 'cal';
 
 // 係数取得（DBから完全一致 → 部分一致 → デフォルト）
@@ -2565,6 +2613,12 @@ function selectExercise(name) {
   });
 }
 
+// ─── 記録日取得 ───
+function getWorkoutDate() {
+  const picker = document.getElementById('wkDatePicker');
+  return (picker && picker.value) ? picker.value : todayStr();
+}
+
 // ─── 記録追加 ───
 function addWorkout() {
   if (!selectedExercise) { showToast('種目を選んでください'); return; }
@@ -2576,9 +2630,10 @@ function addWorkout() {
 
   const factor = getExerciseFactor(selectedExercise);
   const kcal   = Math.round(weight * sets * reps * factor);
+  const date   = getWorkoutDate(); // 選択日に記録
 
   state.workouts.push({
-    date: todayStr(), name: selectedExercise,
+    date, name: selectedExercise,
     weight, reps, sets, calories: kcal, id: Date.now()
   });
   save();
@@ -2589,22 +2644,34 @@ function addWorkout() {
   showToast(`✅ ${selectedExercise}（約${kcal}kcal）`);
   renderCalendar();
   renderWorkoutList();
+  renderWkCalendar();
 }
 
 // ─── ビュー切替 ───
-// ─── 筋トレ今日のログ描画 ───
+// ─── 筋トレログ描画（選択日） ───
 function renderWorkoutList() {
-  const today = todayStr();
-  const todayWorkouts = state.workouts.filter(w => w.date === today);
+  const date = getWorkoutDate();
+  const dayWorkouts = state.workouts.filter(w => w.date === date);
   const log = document.getElementById('workoutLog');
   if (!log) return;
 
-  if (todayWorkouts.length === 0) {
+  // タイトル更新
+  const titleEl = document.getElementById('wkLogTitle');
+  if (titleEl) {
+    if (date === todayStr()) {
+      titleEl.textContent = '今日のトレーニング';
+    } else {
+      const [, m, d] = date.split('-');
+      titleEl.textContent = `${parseInt(m)}月${parseInt(d)}日のトレーニング`;
+    }
+  }
+
+  if (dayWorkouts.length === 0) {
     log.innerHTML = '<div class="empty-state"><div class="empty-icon">🏋️</div><p>まだ記録がありません</p></div>';
     return;
   }
   const grouped = {};
-  for (const w of todayWorkouts) {
+  for (const w of dayWorkouts) {
     if (!grouped[w.name]) grouped[w.name] = [];
     grouped[w.name].push(w);
   }
@@ -2617,10 +2684,86 @@ function renderWorkoutList() {
     </div>`).join('');
 }
 
+// ─── 筋トレミニカレンダー描画 ───
+function renderWkCalendar() {
+  const today      = new Date();
+  const mm         = String(wkCalMonth + 1).padStart(2, '0');
+  const prefix     = `${wkCalYear}-${mm}-`;
+  const selected   = getWorkoutDate();
+
+  const workoutDays  = new Set(state.workouts.filter(w => w.date.startsWith(prefix)).map(w => w.date));
+
+  const firstDay    = new Date(wkCalYear, wkCalMonth, 1).getDay();
+  const daysInMonth = new Date(wkCalYear, wkCalMonth + 1, 0).getDate();
+  const daysInPrev  = new Date(wkCalYear, wkCalMonth, 0).getDate();
+
+  document.getElementById('wkCalMonthLabel').textContent = `${wkCalYear}年${wkCalMonth + 1}月`;
+
+  const DOW = ['日','月','火','水','木','金','土'];
+  let html = DOW.map(d => `<div class="cal-dow">${d}</div>`).join('');
+
+  for (let i = 0; i < firstDay; i++) {
+    html += `<div class="cal-day other-month">${daysInPrev - firstDay + 1 + i}</div>`;
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${wkCalYear}-${mm}-${String(d).padStart(2, '0')}`;
+    const isToday   = today.getFullYear() === wkCalYear && today.getMonth() === wkCalMonth && today.getDate() === d;
+    const hasWk     = workoutDays.has(dateStr);
+    const isSel     = dateStr === selected;
+
+    let cls = 'cal-day';
+    if (isSel)             cls += ' wk-selected';
+    else if (isToday && !hasWk) cls += ' today';
+    if (hasWk)             cls += ' has-workout';
+    if (isToday && hasWk && !isSel) cls += ' today-active';
+
+    html += `<div class="${cls}" onclick="selectWkDate('${dateStr}')">${d}</div>`;
+  }
+
+  const total = firstDay + daysInMonth;
+  const rem   = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for (let i = 1; i <= rem; i++) html += `<div class="cal-day other-month">${i}</div>`;
+
+  document.getElementById('wkCalGrid').innerHTML = html;
+}
+
+// ─── カレンダー日付タップ → 記録日を変更 ───
+function selectWkDate(dateStr) {
+  const picker = document.getElementById('wkDatePicker');
+  if (picker) picker.value = dateStr;
+  const [y, m] = dateStr.split('-');
+  wkCalYear  = parseInt(y);
+  wkCalMonth = parseInt(m) - 1;
+  renderWkCalendar();
+  renderWorkoutList();
+}
+
+// ─── 日付ピッカー変更 ───
+function onWkDateChange() {
+  const date = getWorkoutDate();
+  const [y, m] = date.split('-');
+  wkCalYear  = parseInt(y);
+  wkCalMonth = parseInt(m) - 1;
+  renderWkCalendar();
+  renderWorkoutList();
+}
+
+// ─── ミニカレンダー月移動 ───
+function wkCalMove(delta) {
+  wkCalMonth += delta;
+  if (wkCalMonth > 11) { wkCalMonth = 0; wkCalYear++; }
+  if (wkCalMonth < 0)  { wkCalMonth = 11; wkCalYear--; }
+  renderWkCalendar();
+}
+
 // ─── 筋トレページ初期化 ───
 function renderWorkout() {
+  const picker = document.getElementById('wkDatePicker');
+  if (picker && !picker.value) picker.value = todayStr();
   renderCategoryTabs();
   renderWorkoutList();
+  renderWkCalendar();
 }
 
 // ===== 統合カレンダー =====
