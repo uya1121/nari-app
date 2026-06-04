@@ -517,9 +517,19 @@
   .fab:active { transform: scale(0.94); box-shadow: 0 2px 10px rgba(29,158,117,0.3); }
 
   /* ===== CHAT PAGE ===== */
+  #page-chat {
+    padding: 0;
+    min-height: unset;
+    height: calc(100vh - 54px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
   .chat-wrap {
     display: flex; flex-direction: column;
-    height: calc(100vh - 52px - 58px);
+    flex: 1;
+    min-height: 0;
   }
 
   .chat-messages {
@@ -571,7 +581,7 @@
   .msg-nutrient span { font-weight: 700; color: var(--ink); }
 
   .chat-input-area {
-    padding: 8px 16px 12px;
+    padding: 8px 16px calc(12px + 58px + env(safe-area-inset-bottom, 0px));
     border-top: 1px solid var(--hairline-soft);
     background: rgba(255,255,255,0.88);
     backdrop-filter: saturate(180%) blur(20px);
