@@ -3136,6 +3136,17 @@ function renderUnifiedCalendar() {
   _updateCalDayDetail();
 }
 
+function openChatForDate(dateStr) {
+  const picker = document.getElementById('chatDatePicker');
+  if (picker) picker.value = dateStr;
+  showPage('chat');
+}
+
+function openWorkoutForDate(dateStr) {
+  selectWkDate(dateStr);
+  showPage('workout');
+}
+
 function showUnifiedDayDetail(dateStr) {
   const [y, m, d] = dateStr.split('-');
   const label = `${parseInt(m)}月${parseInt(d)}日`;
@@ -3146,8 +3157,18 @@ function showUnifiedDayDetail(dateStr) {
 
   if (!dayMeals.length && !dayWorkouts.length && !dayWeight) {
     document.getElementById('calDayDetail').innerHTML =
-      `<div style="text-align:center;padding:24px;color:var(--ink-faint);font-size:14px">
+      `<div style="text-align:center;padding:24px 16px 20px;color:var(--ink-faint);font-size:14px">
         ${label}の記録はありません
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button onclick="openChatForDate('${dateStr}')"
+            style="flex:1;padding:11px 8px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-pill);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font)">
+            🍽️ 食事を入力
+          </button>
+          <button onclick="openWorkoutForDate('${dateStr}')"
+            style="flex:1;padding:11px 8px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius-pill);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font)">
+            💪 筋トレを入力
+          </button>
+        </div>
       </div>`;
     return;
   }
@@ -3222,6 +3243,18 @@ function showUnifiedDayDetail(dateStr) {
       </div>
     </div>`;
   }
+
+  // 追加ボタン
+  html += `<div style="padding:12px 16px 16px;background:var(--canvas);display:flex;gap:8px">
+    <button onclick="openChatForDate('${dateStr}')"
+      style="flex:1;padding:10px 8px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-pill);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font)">
+      🍽️ 食事を追加
+    </button>
+    <button onclick="openWorkoutForDate('${dateStr}')"
+      style="flex:1;padding:10px 8px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius-pill);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font)">
+      💪 筋トレを追加
+    </button>
+  </div>`;
 
   html += '</div>';
   document.getElementById('calDayDetail').innerHTML = html;
