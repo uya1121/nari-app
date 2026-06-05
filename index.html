@@ -920,17 +920,19 @@
   .cal-viewport {
     overflow: hidden;
     position: relative;
-    touch-action: pan-y;   /* ブラウザは縦スクロールのみ担当、横はJS */
+    touch-action: pan-y;
+    -webkit-transform: translateZ(0); /* iOS Safari: overflow:hiddenをGPUレイヤーで正しくクリップ */
+    transform: translateZ(0);
   }
   .cal-track {
     display: flex;
-    width: 300%;           /* 3パネル分 */
-    transform: translateX(-33.333%);
     will-change: transform;
+    /* width / transform はJS側でpx指定 */
   }
   .cal-panel {
-    width: 33.333%;        /* 1パネル = viewport幅 */
     flex-shrink: 0;
+    overflow: hidden; /* 念のため各パネルも独立クリップ */
+    /* width はJS側でpx指定 */
   }
   .cal-dow {
     text-align: center; font-size: 11px; font-weight: 600;
@@ -3172,10 +3174,9 @@ function renderUnifiedCalendar() {
   const vp    = document.getElementById('calViewport');
   const track = document.getElementById('calTrack');
   if (vp && track) {
-    const w = vp.offsetWidth;
-    // %計算の誤差を防ぐためpxで正確に設定
+    const w = vp.offsetWidth || (window.innerWidth - 40); // 40 = page padding 20px×2
     track.style.width = (w * 3) + 'px';
-    document.querySelectorAll('.cal-panel').forEach(p => p.style.width = w + 'px');
+    document.querySelectorAll('#calTrack .cal-panel').forEach(p => p.style.width = w + 'px');
     track.style.transition = 'none';
     track.style.transform  = `translateX(${-w}px)`;
   }
