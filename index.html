@@ -983,6 +983,26 @@
     border-radius: var(--radius-pill); font-size: 12px;
     color: var(--ink-muted); font-weight: 500;
   }
+  .rm-badge {
+    margin-top: 8px;
+    font-size: 12px; font-weight: 600;
+    color: var(--green);
+    letter-spacing: 0.1px;
+  }
+  .wk-menu-actions {
+    display: flex; gap: 8px; margin-top: 16px;
+  }
+  .wk-menu-btn {
+    flex: 1; padding: 10px 8px;
+    border-radius: var(--radius-pill);
+    font-size: 13px; font-weight: 500;
+    cursor: pointer; font-family: var(--font);
+    border: 1px solid var(--hairline);
+    background: var(--canvas); color: var(--ink);
+  }
+  .wk-menu-btn.primary {
+    background: var(--green); color: #fff; border-color: var(--green);
+  }
 
   /* 日別詳細 */
   .day-detail-bar {
@@ -2747,6 +2767,13 @@ const EXERCISE_DB = {
 let selectedCategory = '胸';
 let selectedExercise = null;
 let exChipsVisible = false;
+let copiedWorkout = null; // コピーされたメニュー
+
+// 推定1RM（Epley式）: weight × (1 + reps / 30)
+function calc1RM(weight, reps) {
+  if (!weight || !reps) return 0;
+  return Math.round(weight * (1 + reps / 30) * 2) / 2; // 0.5kg単位
+}
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth(); // 0-indexed
 let wkCalYear  = new Date().getFullYear();
@@ -2875,21 +2902,66 @@ function renderWorkoutList() {
   }
 
   if (dayWorkouts.length === 0) {
-    log.innerHTML = '<div class="empty-state"><div class="empty-icon">🏋️</div><p>まだ記録がありません</p></div>';
+    const pasteBtn = copiedWorkout
+      ? `<button class="wk-menu-btn primary" onclick="pasteWorkoutMenu()" style="margin-top:16px;width:100%">📋 前回のメニューを貼り付け</button>`
+      : '';
+    log.innerHTML = `<div class="empty-state"><div class="empty-icon">🏋️</div><p>まだ記録がありません</p>${pasteBtn}</div>`;
     return;
   }
+
   const grouped = {};
   for (const w of dayWorkouts) {
     if (!grouped[w.name]) grouped[w.name] = [];
     grouped[w.name].push(w);
   }
-  log.innerHTML = Object.entries(grouped).map(([name, sets]) => `
+
+  const items = Object.entries(grouped).map(([name, sets]) => {
+    // 各セットの1RMを計算し最大値を表示
+    const best1RM = Math.max(...sets.map(s => calc1RM(s.weight, s.reps)));
+    return `
     <div class="workout-item">
       <div class="workout-name">💪 ${name}</div>
       <div class="workout-sets">
         ${sets.map(s => `<div class="set-chip">${s.weight}kg × ${s.reps}rep × ${s.sets}set</div>`).join('')}
       </div>
-    </div>`).join('');
+      <div class="rm-badge">推定1RM: ${best1RM}kg</div>
+    </div>`;
+  }).join('');
+
+  const pasteBtn = copiedWorkout
+    ? `<button class="wk-menu-btn" onclick="pasteWorkoutMenu()">📋 コピーしたメニューを貼り付け</button>` : '';
+
+  log.innerHTML = items + `
+    <div class="wk-menu-actions">
+      <button class="wk-menu-btn primary" onclick="copyWorkoutMenu()">📋 このメニューをコピー</button>
+      ${pasteBtn}
+    </div>`;
+}
+
+function copyWorkoutMenu() {
+  const date = getWorkoutDate();
+  const dayWorkouts = state.workouts.filter(w => w.date === date);
+  if (!dayWorkouts.length) return;
+  copiedWorkout = dayWorkouts.map(w => ({
+    name: w.name, weight: w.weight, reps: w.reps, sets: w.sets
+  }));
+  showToast(`✅ ${dayWorkouts.length}種目をコピーしました`);
+  renderWorkoutList(); // 貼り付けボタンを更新
+}
+
+function pasteWorkoutMenu() {
+  if (!copiedWorkout || !copiedWorkout.length) return;
+  const date = getWorkoutDate();
+  copiedWorkout.forEach(w => {
+    const factor = getExerciseFactor(w.name);
+    const kcal   = Math.round(w.weight * w.sets * w.reps * factor);
+    state.workouts.push({ date, name: w.name, weight: w.weight, reps: w.reps, sets: w.sets, calories: kcal, id: Date.now() + Math.random() });
+  });
+  save();
+  showToast(`✅ ${copiedWorkout.length}種目を貼り付けました`);
+  renderCalendar();
+  renderWorkoutList();
+  renderWkCalendar();
 }
 
 // ─── 筋トレミニカレンダー描画 ───
