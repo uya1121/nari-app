@@ -1970,6 +1970,9 @@ function showPage(page) {
   document.getElementById('page-' + page).classList.add('active');
   document.getElementById('nav-' + page).classList.add('active');
 
+  // チャットページではFABを非表示（送信ボタンと重なるため）
+  document.getElementById('fab').style.display = page === 'chat' ? 'none' : 'flex';
+
   if (page === 'home') { renderHome(); renderWeight(); }
   if (page === 'workout') renderWorkout();
   if (page === 'calendar') renderUnifiedCalendar();
